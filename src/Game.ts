@@ -82,6 +82,7 @@ export interface GameOptions {
   turmoilExtension: boolean;
   promoCardsOption: boolean;
   communityCardsOption: boolean;
+  politicalAgendasExtension: boolean;
   aresExtension: boolean;
   aresHazards: boolean;
   solarPhaseOption: boolean;
@@ -116,6 +117,7 @@ const DEFAULT_GAME_OPTIONS: GameOptions = {
   fastModeOption: false,
   includeVenusMA: true,
   initialDraftVariant: false,
+  politicalAgendasExtension: false,
   preludeExtension: false,
   promoCardsOption: false,
   randomMA: RandomMAOptionType.NONE,
@@ -245,7 +247,7 @@ export class Game implements ISerializable<SerializedGame> {
 
       // Add Turmoil stuff
       if (gameOptions.turmoilExtension) {
-        this.turmoil = Turmoil.newInstance(this);
+        this.turmoil = Turmoil.newInstance(this, gameOptions.politicalAgendasExtension);
       }
 
       // Setup Ares hazards
