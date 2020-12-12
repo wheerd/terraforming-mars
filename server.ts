@@ -293,22 +293,15 @@ function loadGame(req: http.IncomingMessage, res: http.ServerResponse): void {
         Database.getInstance().deleteGameNbrSaves(game_id, rollbackCount);
       }
 
-      const player = new Player('test', Color.BLUE, false, 0);
-      const player2 = new Player('test2', Color.RED, false, 0);
-      const gameToRebuild = new Game(game_id, [player, player2], player);
-      Database.getInstance().restoreGameLastSave(
-        game_id,
-        gameToRebuild,
-        function(err) {
-          if (err) {
-            return;
-          }
-          gameLoader.addGame(gameToRebuild);
-        },
-      );
-      res.setHeader('Content-Type', 'application/json');
-      res.write(getGame(gameToRebuild));
-      res.end();
+      gameLoader.getGameByGameId(game_id, (game) => {
+        if (game === undefined) {
+          // game was not found!
+          return;
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.write(getGame(game));
+        res.end();
+      });
     } catch (error) {
       route.internalServerError(req, res, error);
     }
