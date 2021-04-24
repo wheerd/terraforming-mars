@@ -6,20 +6,21 @@ import {Game} from '../../../src/Game';
 import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {Resources} from '../../../src/Resources';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Gyropolis', function() {
   it('Should play', function() {
     const card = new Gyropolis();
     const player = TestPlayers.BLUE.newPlayer();
-    const game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
     const card1 = new ResearchNetwork();
     const card2 = new LunaGovernor();
 
     player.playedCards.push(card1, card2);
     player.addProduction(Resources.ENERGY, 2);
-    expect(card.canPlay(player, game)).is.true;
-    const action = card.play(player, game) as SelectSpace;
+    expect(card.canPlay(player)).is.true;
+    const action = card.play(player) as SelectSpace;
     expect(action).is.not.undefined;
     expect(action.cb(action.availableSpaces[0])).is.undefined;
     expect(action.availableSpaces[0].player).to.eq(player);

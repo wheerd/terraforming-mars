@@ -6,20 +6,21 @@ import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {NaturalPreserveAres} from '../../../src/cards/ares/NaturalPreserveAres';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {ARES_OPTIONS_NO_HAZARDS} from '../../ares/AresTestHelper';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('NaturalPreserveAres', function() {
-  let card : NaturalPreserveAres; let player : Player; let game : Game;
+  let card : NaturalPreserveAres; let player : Player;
 
   beforeEach(function() {
     card = new NaturalPreserveAres();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player, ARES_OPTIONS_NO_HAZARDS);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player, ARES_OPTIONS_NO_HAZARDS);
   });
 
   it('Should play', function() {
-    expect(card.canPlay(player, game)).is.true;
-    const action = card.play(player, game);
+    expect(card.canPlay(player)).is.true;
+    const action = card.play(player);
     expect(action).is.not.undefined;
     expect(action instanceof SelectSpace).is.true;
 

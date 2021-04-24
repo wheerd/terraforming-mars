@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import {Bonus} from './Bonus';
 import {SpaceModel} from '../models/SpaceModel';
+import {SpaceType} from '../SpaceType';
 import {TileType} from '../TileType';
 import {$t} from '../directives/i18n';
 
@@ -19,30 +20,30 @@ const tileTypeToCssClass = new Map<TileType, string>([
   [TileType.DEIMOS_DOWN, 'deimos_down'],
   [TileType.GREAT_DAM, 'great_dam'],
   [TileType.MAGNETIC_FIELD_GENERATORS, 'magnetic_field_generators'],
-  [TileType.BIOFERTILIZER_FACILITY, 'biofertilizer_facility'],
-  [TileType.METALLIC_ASTEROID, 'metallic_asteroid'],
-  [TileType.SOLAR_FARM, 'solar_farm'],
-  [TileType.OCEAN_CITY, 'ocean_city'],
-  [TileType.OCEAN_FARM, 'ocean_farm'],
-  [TileType.OCEAN_SANCTUARY, 'ocean_sanctuary'],
-  [TileType.DUST_STORM_MILD, 'dust_storm_mild'],
-  [TileType.DUST_STORM_SEVERE, 'dust_storm_severe'],
-  [TileType.EROSION_MILD, 'erosion_mild'],
-  [TileType.EROSION_SEVERE, 'erosion_severe'],
-  [TileType.MINING_STEEL_BONUS, 'mining_steel'],
-  [TileType.MINING_TITANIUM_BONUS, 'mining_titanium'],
+  [TileType.BIOFERTILIZER_FACILITY, 'biofertilizer-facility'],
+  [TileType.METALLIC_ASTEROID, 'metallic-asteroid'],
+  [TileType.SOLAR_FARM, 'solar-farm'],
+  [TileType.OCEAN_CITY, 'ocean-city'],
+  [TileType.OCEAN_FARM, 'ocean-farm'],
+  [TileType.OCEAN_SANCTUARY, 'ocean-sanctuary'],
+  [TileType.DUST_STORM_MILD, 'dust-storm-mild'],
+  [TileType.DUST_STORM_SEVERE, 'dust-storm-severe'],
+  [TileType.EROSION_MILD, 'erosion-mild'],
+  [TileType.EROSION_SEVERE, 'erosion-severe'],
+  [TileType.MINING_STEEL_BONUS, 'mining-steel'],
+  [TileType.MINING_TITANIUM_BONUS, 'mining-titanium'],
 ]);
 
 const tileTypeToCssClassAresOverride = new Map<TileType, string>([
-  [TileType.COMMERCIAL_DISTRICT, 'commercial_district_ares'],
-  [TileType.ECOLOGICAL_ZONE, 'ecological_zone_ares'],
-  [TileType.INDUSTRIAL_CENTER, 'industrial_center_ares'],
-  [TileType.LAVA_FLOWS, 'lava_flows_ares'],
-  [TileType.CAPITAL, 'capital_ares'],
-  [TileType.MOHOLE_AREA, 'mohole_area_ares'],
-  [TileType.NATURAL_PRESERVE, 'natural_preserve_ares'],
-  [TileType.NUCLEAR_ZONE, 'nuclear_zone_ares'],
-  [TileType.RESTRICTED_AREA, 'restricted_area_ares'],
+  [TileType.COMMERCIAL_DISTRICT, 'commercial-district-ares'],
+  [TileType.ECOLOGICAL_ZONE, 'ecological-zone-ares'],
+  [TileType.INDUSTRIAL_CENTER, 'industrial-center-ares'],
+  [TileType.LAVA_FLOWS, 'lava-flows-ares'],
+  [TileType.CAPITAL, 'capital-ares'],
+  [TileType.MOHOLE_AREA, 'mohole-area-ares'],
+  [TileType.NATURAL_PRESERVE, 'natural-preserve-ares'],
+  [TileType.NUCLEAR_ZONE, 'nuclear-zone-ares'],
+  [TileType.RESTRICTED_AREA, 'restricted-area-ares'],
 ]);
 
 export const BoardSpace = Vue.component('board-space', {
@@ -57,6 +58,9 @@ export const BoardSpace = Vue.component('board-space', {
       type: Boolean,
     },
     aresExtension: {
+      type: Boolean,
+    },
+    isTileHidden: {
       type: Boolean,
     },
   },
@@ -133,6 +137,10 @@ export const BoardSpace = Vue.component('board-space', {
       if (this.is_selectable) {
         css += ' board-space-selectable';
       }
+      return css;
+    },
+    getTileClass: function(): string {
+      let css = 'board-space';
       const tileType = this.space.tileType;
       if (tileType !== undefined) {
         switch (this.space.tileType) {
@@ -153,21 +161,30 @@ export const BoardSpace = Vue.component('board-space', {
           css += ' board-space-tile--' + cssClass;
         }
       } else {
-        if (this.space.spaceType === 'ocean') {
+        if (this.space.spaceType === SpaceType.OCEAN) {
           css += ' board-space-type-ocean';
         } else {
-          css += ' board-space-type-land';
+          css += ` board-space-type-land`;
+
+          const highlight = this.space.highlight;
+          if (highlight) {
+            css += ` board-space-type-land-${highlight}`;
+          }
         }
       }
-
+      if (this.isTileHidden) {
+        css += ' board-hidden-tile';
+      }
       return css;
     },
   },
   template: `
-        <div :class="getMainClass()" :data_space_id="space.id" :title="getVerboseTitle(space.tileType)">
+        <div :class="getMainClass()" :data_space_id="space.id">
+            <div :class="getTileClass()" :title="getVerboseTitle(space.tileType)"></div>
             <div class="board-space-text" v-if="text" v-i18n>{{ text }}</div>
             <bonus :bonus="space.bonus" v-if="space.tileType === undefined"></bonus>
-            <div :class="'board-cube board-cube--'+space.color" v-if="space.color !== undefined"></div>
+            <bonus :bonus="space.bonus" v-if="space.tileType !== undefined && isTileHidden"></bonus>
+            <div :class="'board-cube board-cube--'+space.color" v-if="space.color !== undefined && !isTileHidden "></div>
         </div>
     `,
 });

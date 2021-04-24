@@ -5,7 +5,7 @@ import {TollStation} from '../../../src/cards/base/TollStation';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Shuttles', function() {
   let card : Shuttles; let player : Player; let game : Game;
@@ -13,24 +13,25 @@ describe('Shuttles', function() {
   beforeEach(function() {
     card = new Shuttles();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play without energy production', function() {
     (game as any).oxygenLevel = 5;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Can\'t play if oxygen level too low', function() {
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     (game as any).oxygenLevel = 4;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).oxygenLevel = 5;
-    player.addProduction(Resources.ENERGY);
-    expect(card.canPlay(player, game)).is.true;
+    player.addProduction(Resources.ENERGY, 1);
+    expect(card.canPlay(player)).is.true;
 
     card.play(player);
     expect(player.getProduction(Resources.ENERGY)).to.eq(0);
@@ -39,7 +40,7 @@ describe('Shuttles', function() {
     player.victoryPointsBreakdown.setVictoryPoints('victoryPoints', card.getVictoryPoints());
     expect(player.victoryPointsBreakdown.victoryPoints).to.eq(1);
 
-    expect(card.getCardDiscount(player, game, new Bushes())).to.eq(0);
-    expect(card.getCardDiscount(player, game, new TollStation())).to.eq(2);
+    expect(card.getCardDiscount(player, new Bushes())).to.eq(0);
+    expect(card.getCardDiscount(player, new TollStation())).to.eq(2);
   });
 });

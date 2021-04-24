@@ -4,7 +4,7 @@ import {Game} from '../../src/Game';
 import {Player} from '../../src/Player';
 import {SpaceType} from '../../src/SpaceType';
 import {TileType} from '../../src/TileType';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 import {AresTestHelper, ARES_OPTIONS_NO_HAZARDS} from './AresTestHelper';
 
 describe('OtherAresTests', function() {
@@ -15,7 +15,7 @@ describe('OtherAresTests', function() {
   it('Desert settler counts upgraded oceans', function() {
     player = TestPlayers.BLUE.newPlayer();
     otherPlayer = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, otherPlayer], player, ARES_OPTIONS_NO_HAZARDS);
+    game = Game.newInstance('foobar', [player, otherPlayer], player, ARES_OPTIONS_NO_HAZARDS);
 
     const oceanSpace = game.board.getAvailableSpacesForOcean(player).filter((s) => s.y >= 5)[0];
     game.addOceanTile(player, oceanSpace.id);
@@ -24,10 +24,10 @@ describe('OtherAresTests', function() {
     }
 
     const award = new DesertSettler();
-    expect(award.getScore(player, game)).eq(0);
+    expect(award.getScore(player)).eq(0);
 
     game.addTile(player, SpaceType.OCEAN, oceanSpace, {tileType: TileType.OCEAN_CITY});
 
-    expect(award.getScore(player, game)).eq(1);
+    expect(award.getScore(player)).eq(1);
   });
 });

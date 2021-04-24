@@ -3,30 +3,49 @@ import {Player} from '../../Player';
 import {Tags} from '../Tags';
 import {ResourceType} from '../../ResourceType';
 import {Resources} from '../../Resources';
-import {Game} from '../../Game';
 import {IProjectCard} from '../IProjectCard';
 import {SelectOption} from '../../inputs/SelectOption';
 import {OrOptions} from '../../inputs/OrOptions';
+import {Card} from '../Card';
 import {CardName} from '../../CardName';
 import {IResourceCard} from '../ICard';
 import {CardType} from '../CardType';
+import {CardRenderer} from '../render/CardRenderer';
 
+export class Recyclon extends Card implements CorporationCard, IResourceCard {
+  constructor() {
+    super({
+      cardType: CardType.CORPORATION,
+      name: CardName.RECYCLON,
+      tags: [Tags.MICROBE, Tags.BUILDING],
+      startingMegaCredits: 38,
+      resourceType: ResourceType.MICROBE,
 
-export class Recyclon implements CorporationCard, IResourceCard {
-    public name = CardName.RECYCLON;
-    public tags = [Tags.MICROBES, Tags.STEEL];
-    public startingMegaCredits: number = 38;
-    public resourceType = ResourceType.MICROBE;
-    public resourceCount: number = 0;
-    public cardType = CardType.CORPORATION;
+      metadata: {
+        cardNumber: 'R26',
+        description: 'You start with 38 M€ and 1 steel production.',
+        renderData: CardRenderer.builder((b) => {
+          b.br.br;
+          b.megacredits(38).nbsp.production((pb) => pb.steel(1));
+          b.corpBox('effect', (ce) => {
+            ce.effect('When you play a building tag, including this, gain 1 microbe to this card, or remove 2 microbes here and raise your plant production 1 step.', (eb) => {
+              eb.building().played.colon().microbes(1).or();
+              eb.microbes(2).digit.startEffect.production((pb) => pb.plants(1));
+            });
+          });
+        }),
+      },
+    });
+  }
+    public resourceCount = 0;
 
     public play(player: Player) {
-      player.addProduction(Resources.STEEL);
+      player.addProduction(Resources.STEEL, 1);
       player.addResourceTo(this);
       return undefined;
     }
-    public onCardPlayed(player: Player, _game: Game, card: IProjectCard) {
-      if (card.tags.indexOf(Tags.STEEL) === -1 || !player.isCorporation(this.name)) {
+    public onCardPlayed(player: Player, card: IProjectCard) {
+      if (card.tags.includes(Tags.BUILDING) === false || !player.isCorporation(this.name)) {
         return undefined;
       }
       if (this.resourceCount < 2) {
@@ -41,7 +60,7 @@ export class Recyclon implements CorporationCard, IResourceCard {
 
       const spendResource = new SelectOption('Remove 2 microbes on this card and increase plant production 1 step', 'Remove microbes', () => {
         player.removeResourceFrom(this, 2);
-        player.addProduction(Resources.PLANTS);
+        player.addProduction(Resources.PLANTS, 1);
         return undefined;
       });
       return new OrOptions(spendResource, addResource);

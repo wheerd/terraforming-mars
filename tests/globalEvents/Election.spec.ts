@@ -4,7 +4,7 @@ import {Game} from '../../src/Game';
 import {Election} from '../../src/turmoil/globalEvents/Election';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('Election', function() {
   it('resolve play', function() {
@@ -12,7 +12,7 @@ describe('Election', function() {
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
     const player3 = TestPlayers.GREEN.newPlayer();
-    const game = new Game('foobar', [player, player2, player3], player);
+    const game = Game.newInstance('foobar', [player, player2, player3], player);
     const turmoil = Turmoil.newInstance(game);
     turmoil.initGlobalEvent(game);
     player.playedCards.push(new StripMine());

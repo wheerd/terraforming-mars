@@ -5,26 +5,27 @@ import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('CorporateStronghold', function() {
-  let card : CorporateStronghold; let player : Player; let game : Game;
+  let card : CorporateStronghold; let player : Player;
 
   beforeEach(function() {
     card = new CorporateStronghold();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
-    player.addProduction(Resources.ENERGY);
-    expect(card.canPlay(player, game)).is.true;
+    player.addProduction(Resources.ENERGY, 1);
+    expect(card.canPlay(player)).is.true;
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action instanceof SelectSpace).is.true;
     action.cb(action.availableSpaces[0]);
 

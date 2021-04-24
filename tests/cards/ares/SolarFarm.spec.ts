@@ -8,7 +8,7 @@ import {Resources} from '../../../src/Resources';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {TileType} from '../../../src/TileType';
 import {ARES_OPTIONS_WITH_HAZARDS} from '../../ares/AresTestHelper';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('SolarFarm', function() {
   let card: SolarFarm; let player: Player; let game: Game;
@@ -16,7 +16,8 @@ describe('SolarFarm', function() {
   beforeEach(function() {
     card = new SolarFarm();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player, ARES_OPTIONS_WITH_HAZARDS);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player, ARES_OPTIONS_WITH_HAZARDS);
   });
 
   it('Play', function() {
@@ -34,7 +35,7 @@ describe('SolarFarm', function() {
       SpaceBonus.PLANT,
     ];
 
-    const action = card.play(player, game);
+    const action = card.play(player);
 
     expect(action instanceof SelectSpace).is.true;
 

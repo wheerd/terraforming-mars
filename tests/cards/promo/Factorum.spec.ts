@@ -3,13 +3,14 @@ import {Factorum} from '../../../src/cards/promo/Factorum';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Factorum', function() {
   it('Should play', function() {
     const card = new Factorum();
     const player = TestPlayers.BLUE.newPlayer();
-    const game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
     const play = card.play(player);
     expect(play).is.undefined;
     expect(player.getProduction(Resources.STEEL)).to.eq(1);
@@ -17,7 +18,7 @@ describe('Factorum', function() {
 
     player.corporationCard = card;
 
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action instanceof OrOptions).is.true;
     if ( ! (action instanceof OrOptions)) return;
 

@@ -5,16 +5,16 @@ import {Player} from '../../src/Player';
 import {Resources} from '../../src/Resources';
 import {SpaceType} from '../../src/SpaceType';
 import {TileType} from '../../src/TileType';
-import {ISpace} from '../../src/ISpace';
-import {setCustomGameOptions} from '../TestingUtils';
+import {ISpace} from '../../src/boards/ISpace';
+import {TestingUtils} from '../TestingUtils';
 import {AresHandler} from '../../src/ares/AresHandler';
 
-export const ARES_OPTIONS_NO_HAZARDS = setCustomGameOptions({
+export const ARES_OPTIONS_NO_HAZARDS = TestingUtils.setCustomGameOptions({
   aresExtension: true,
   aresHazards: false,
 });
 
-export const ARES_OPTIONS_WITH_HAZARDS = setCustomGameOptions({
+export const ARES_OPTIONS_WITH_HAZARDS = TestingUtils.setCustomGameOptions({
   aresExtension: true,
   aresHazards: true,
 });
@@ -33,21 +33,21 @@ export const ALL_ADJACENCY_BONUSES = [
 
 export class AresTestHelper {
   // provides shared testing between Ecological Survey and Geological Survey
-  public static testSurveyBonus(game: Game, player: Player, bonus: SpaceBonus, expectedMc: number) {
+  public static testSurveyBonus(player: Player, bonus: SpaceBonus, expectedMc: number) {
     // tile types in this test are irrelevant.
-    const firstSpace = game.board.getAvailableSpacesOnLand(player)[0];
+    const firstSpace = player.game.board.getAvailableSpacesOnLand(player)[0];
     firstSpace.adjacency = {bonus: [bonus]};
-    game.addTile(player, SpaceType.LAND, firstSpace, {tileType: TileType.RESTRICTED_AREA});
+    player.game.addTile(player, SpaceType.LAND, firstSpace, {tileType: TileType.RESTRICTED_AREA});
 
     expect(player.getResource(Resources.MEGACREDITS)).is.eq(0);
-    const adjacentSpace = game.board.getAdjacentSpaces(firstSpace)[0];
-    game.addTile(player, adjacentSpace.spaceType, adjacentSpace, {tileType: TileType.GREENERY});
+    const adjacentSpace = player.game.board.getAdjacentSpaces(firstSpace)[0];
+    player.game.addTile(player, adjacentSpace.spaceType, adjacentSpace, {tileType: TileType.GREENERY});
     expect(player.getResource(Resources.MEGACREDITS)).is.eq(expectedMc);
   }
 
-  public static addGreenery(game: Game, player: Player): ISpace {
-    const space = game.board.getAvailableSpacesForGreenery(player)[0];
-    game.addGreenery(player, space.id);
+  public static addGreenery(player: Player): ISpace {
+    const space = player.game.board.getAvailableSpacesForGreenery(player)[0];
+    player.game.addGreenery(player, space.id);
     return space;
   }
 

@@ -46,6 +46,7 @@ import {Splice} from './Splice';
 import {StanfordTorus} from './StanfordTorus';
 import {SubCrustMeasurements} from './SubCrustMeasurements';
 import {TopsoilContract} from './TopsoilContract';
+import {BioPrintingFacility} from './BioPrintingFacility';
 
 export const PROMO_CARD_MANIFEST = new CardManifest({
   module: GameModule.Promo,
@@ -87,9 +88,10 @@ export const PROMO_CARD_MANIFEST = new CardManifest({
     {cardName: CardName.GREAT_DAM_PROMO, Factory: GreatDamPromo},
     {cardName: CardName.MAGNETIC_FIELD_GENERATORS_PROMO, Factory: MagneticFieldGeneratorsPromo},
     {cardName: CardName.SATURN_SURFING, Factory: SaturnSurfing},
+    {cardName: CardName.BIO_PRINTING_FACILITY, Factory: BioPrintingFacility},
   ],
 
-  projectCardsToRemove: [
+  cardsToRemove: [
     CardName.DEIMOS_DOWN,
     CardName.GREAT_DAM,
     CardName.MAGNETIC_FIELD_GENERATORS],

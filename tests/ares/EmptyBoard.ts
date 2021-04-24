@@ -1,11 +1,9 @@
-import {Board} from '../../src/Board';
-import {BoardBuilder} from '../../src/BoardBuilder';
+import {Board} from '../../src/boards/Board';
+import {BoardBuilder} from '../../src/boards/BoardBuilder';
 
 export class EmptyBoard extends Board {
-  constructor() {
-    super();
-
-    const builder = new BoardBuilder(0);
+  public static newInstance() {
+    const builder = new BoardBuilder(false);
 
     // y=0
     builder.land().land().land().land().land();
@@ -26,6 +24,13 @@ export class EmptyBoard extends Board {
     // y=8
     builder.land().land().land().land().land();
 
-    this.spaces = builder.build();
+    return new EmptyBoard(builder.build());
+  }
+  public getVolcanicSpaceIds(): Array<string> {
+    return [];
+  }
+
+  public getNoctisCitySpaceIds(): Array<string> {
+    return [];
   }
 }

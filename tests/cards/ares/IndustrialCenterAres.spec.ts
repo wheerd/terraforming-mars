@@ -5,7 +5,7 @@ import {TileType} from '../../../src/TileType';
 import {IndustrialCenterAres} from '../../../src/cards/ares/IndustrialCenterAres';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {ARES_OPTIONS_NO_HAZARDS} from '../../ares/AresTestHelper';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('IndustrialCenterAres', function() {
   let card : IndustrialCenterAres; let player : Player; let game : Game;
@@ -13,14 +13,15 @@ describe('IndustrialCenterAres', function() {
   beforeEach(function() {
     card = new IndustrialCenterAres();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player, ARES_OPTIONS_NO_HAZARDS);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player, ARES_OPTIONS_NO_HAZARDS);
   });
 
   it('Should play', function() {
     game.addCityTile(player, game.board.getAvailableSpacesOnLand(player)[0].id);
     expect(game.getCitiesInPlayOnMars()).to.eq(1);
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     const space = action!.availableSpaces[0];
         action!.cb(space);
         expect(space.tile).is.not.undefined;

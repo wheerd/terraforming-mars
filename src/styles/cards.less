@@ -34,13 +34,39 @@
     }
 }
 
-.cards-action-was-used {
-    filter: grayscale(1);
+.card-unavailable {
+    filter: brightness(0.55);
+}
+
+.card-hide {
+    display: none;
 }
 
 .nofloat {
     clear: both;
     margin-bottom: 15px;
+}
+
+.cardbox-with-owner-label {
+    padding-bottom: 25px;
+}
+
+.card-owner-label {
+    border-radius: 0px 0px 15px 15px;
+    margin: auto;
+    margin-top: 10px;
+    width: 60%;
+    padding: 3px 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.card-warning {
+    font-size: 18px;
+    color: #d73a49;
+    padding: 10px 0;
 }
 
 .filterDiv {
@@ -69,11 +95,6 @@
     box-shadow: 0 0 2px 1px black;
 }
 
-.clicked-card {
-    box-shadow: 0 0 1px 1px #444, 0 0 15px 5px white !important;
-    filter: grayscale(1);
-}
-
 input[type="checkbox"]:checked + .filterDiv,
 input[type="radio"]:checked + .filterDiv {
     box-shadow: 0 0 0 2px #303030, 0 0 0px 6px #c97e23;
@@ -83,10 +104,10 @@ input[type="checkbox"]:checked + .filterDiv::after,
 input[type="radio"]:checked + .filterDiv::after {
     content: "✓";
     position: absolute;
-    width: 252px;
+    width: calc(100% + 12px);
     height: 50px;
     line-height: 50px;
-    top: 195px;
+    top: 50%;
     left: -6px;
     text-align: center;
     font-weight: bold;
@@ -366,7 +387,25 @@ input[type="radio"]:checked + .filterDiv::after {
     border-radius: 50%;
     box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
     content: "A";
-  }
+}
+
+
+.moon-icon:after {
+  position: absolute;
+  color:#DDD;
+  border: 1px solid #222;
+  background: #999;
+  font-family: Prototype;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 17px;
+  width: 16px;
+  height:16px;
+  text-align: center;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+  content: "M";
+}
 
 .button-icon:after {
     margin-top: -9px;
@@ -488,6 +527,10 @@ input[type="radio"]:checked + .filterDiv::after {
     background: linear-gradient(-60deg, #43afa5 10%, #43afa588, #43afa5 90%);
 }
 
+.background-color-standard-project {
+    background: linear-gradient(-60deg, #a0a0a7 10%, #c0c0c0, #a0a0a7 90%);
+}
+
 /*********** Style the tags ************/
 
 .tag-wild {
@@ -530,6 +573,9 @@ input[type="radio"]:checked + .filterDiv::after {
     background-image: url("./assets/tags/science.png");
     background-size: 46px;
     background-position: -3px;
+}
+.tag-moon {
+    background-image: url("./assets/tags/moon.png")
 }
 .tag-none {
     background-image: url("./assets/tags/tag-none.png");
@@ -976,6 +1022,10 @@ input[type="radio"]:checked + .filterDiv::after {
     color: #0000 !important;
     background-image: url(./assets/resources/asteroid.png);
 }
+.disease {
+    color: #0000 !important;
+    background-image: url(./assets/resources/disease.png);
+}
 .pristar {
     background-image: url(./assets/resources/pristar.png);
 }
@@ -1206,28 +1256,6 @@ input[type="radio"]:checked + .filterDiv::after {
     box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.8);
 }
 
-.card-colony {
-    background-color: rgb(44, 44, 44);
-    background: linear-gradient(
-        to right bottom,
-        black,
-        rgb(60, 60, 60),
-        rgb(150, 150, 150),
-        rgb(60, 60, 60),
-        rgb(60, 60, 60),
-        black
-    );
-    color: black;
-    font-size: 12px;
-    width: 44px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 7px;
-    padding-right: 7px;
-    border-radius: 13px;
-    box-shadow: 0 2px 2px 1px rgba(0, 0, 0, 0.8);
-}
-
 /************** Extras ************/
 .red-arrow {
     background-image: url(./assets/misc/arrow.png);
@@ -1391,7 +1419,7 @@ input[type="radio"]:checked + .filterDiv::after {
   border-right: 4px solid #898989;
   z-index: 3;
 }
- 
+
 .card-resources-counter-number {
     z-index: 3;
     font-size: 22px;
@@ -1400,7 +1428,7 @@ input[type="radio"]:checked + .filterDiv::after {
 .card-resources-counter-label {
     text-transform: uppercase;
 }
- 
+
 .polyphemos {
     font-family: Prototype;
     width: 180px;
@@ -1516,13 +1544,6 @@ input[type="radio"]:checked + .filterDiv::after {
     text-align:center;
 }
 
-.card-utopia-invest {
-    .production.wild {
-        vertical-align: middle;
-        margin-left: 5px;
-    }
-}
-
 .factorum {
     color: #ee792b;
     text-shadow: 0 0 1px black, 0 1px black, 1px 0px black, -1px 0px black,
@@ -1532,34 +1553,6 @@ input[type="radio"]:checked + .filterDiv::after {
     transform: scaleX(0.7);
     margin-left: -35px;
     margin-top: 15px;
-}
-
-.mons {
-    background: rgb(200, 110, 35);
-    color: white;
-    text-align: center;
-    width: 80px;
-    height: 75px;
-    box-shadow: 3px 3px 6px #444;
-}
-
-.mons0 {
-    font-size: 38px;
-    transform: scaleX(2.5);
-    margin-top: -15px;
-}
-
-.mons1 {
-    letter-spacing: 5px;
-    font-size: 20px;
-    margin-top: -25px;
-    margin-left: 5px;
-}
-.mons2 {
-    margin-top: -5px;
-    letter-spacing: 3px;
-    margin-left: 2px;
-    font-size: 7px;
 }
 
 .philares {
@@ -2128,7 +2121,26 @@ input[type="radio"]:checked + .filterDiv::after {
     z-index: 1000;
     top: 100px;
     left: 70px;
+    background: url(./assets/martian.png);
+    width: 100px;
+    height: 123px;
 }
+
+.mined-metal {
+    position: absolute;
+    top: 147px;
+    width: 57px;
+    height: 38px;
+    background: url(./assets/misc/production.png);
+    background-size: 72px;
+    &.mined-steel {
+        left: 105px;
+    }
+    &.mined-titanium {
+        left: 69px;
+    }
+}
+
 
 .card-domed-crater {
     .content {
@@ -2237,7 +2249,7 @@ input[type="radio"]:checked + .filterDiv::after {
         }
     }
     .description-starting-resource{
-        text-align: center; 
+        text-align: center;
     }
     .description-effect {
         text-align: center;
@@ -2316,7 +2328,7 @@ input[type="radio"]:checked + .filterDiv::after {
           margin-bottom: -5px;
           vertical-align: text-bottom;
         }
-      
+
         .tile.trade {
             margin: 0 !important;
         }
@@ -2430,7 +2442,7 @@ input[type="radio"]:checked + .filterDiv::after {
     .herbivores-requirement{
         position: absolute;
         text-align: left;
-        margin-top: 42px; 
+        margin-top: 42px;
         width: 130px;
     }
     .production-box{
@@ -2564,6 +2576,13 @@ input[type="radio"]:checked + .filterDiv::after {
     background-image: url(./assets/expansion_icons/expansion_icon_ares.png);
 }
 
+.expansion-icon-agendas {
+    background-image: url(./assets/expansion_icons/expansion_icon_agendas.png);
+}
+.expansion-icon-themoon {
+    background-image: url(./assets/expansion_icons/expansion_icon_themoon.png);
+}
+
 /* refactored */
 .card-container {
     .project-icon:after,
@@ -2665,7 +2684,6 @@ input[type="radio"]:checked + .filterDiv::after {
                     #e28c22
                 );
                 border-radius: 7px 7px 2px 2px;
-                text-transform: uppercase;
             }
             .prelude-label {
                 position: absolute;
@@ -2709,6 +2727,29 @@ input[type="radio"]:checked + .filterDiv::after {
         }
     }
 }
+
+.card-standard-project {
+    height: 155px;
+    width: 235px;
+    .card-content-wrapper {
+        .card-cost-and-tags {
+            position: absolute;
+            top: 6px;
+        }
+        .card-title-standard-project {
+            padding-top: 12px;
+            .background-color-standard-project {
+                border-radius: 16px 16px 30% 30% !important;
+            }
+        }
+        .card-content {
+            height: unset !important;
+            width: unset !important;
+            top: -10px;
+        }
+    }
+}
+
 .celestic-fix {
     position: absolute;
     top: 18px;

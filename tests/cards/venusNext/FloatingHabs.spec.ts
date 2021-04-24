@@ -6,7 +6,7 @@ import {FloatingHabs} from '../../../src/cards/venusNext/FloatingHabs';
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('FloatingHabs', function() {
   let card : FloatingHabs; let player : Player; let game : Game;
@@ -14,7 +14,8 @@ describe('FloatingHabs', function() {
   beforeEach(function() {
     card = new FloatingHabs();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -32,7 +33,7 @@ describe('FloatingHabs', function() {
     player.playedCards.push(card);
     player.megaCredits = 10;
 
-    card.action(player, game);
+    card.action(player);
     game.deferredActions.runNext();
     expect(card.resourceCount).to.eq(1);
     expect(player.megaCredits).to.eq(8);
@@ -41,7 +42,7 @@ describe('FloatingHabs', function() {
   it('Should act - multiple targets', function() {
     player.playedCards.push(card, new Dirigibles());
     player.megaCredits = 10;
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action instanceof SelectCard).is.true;
 
     (action as SelectCard<ICard>).cb([card]);

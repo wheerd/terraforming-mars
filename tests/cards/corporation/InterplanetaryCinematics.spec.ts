@@ -4,15 +4,16 @@ import {Virus} from '../../../src/cards/base/Virus';
 import {InterplanetaryCinematics} from '../../../src/cards/corporation/InterplanetaryCinematics';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('InterplanetaryCinematics', function() {
-  let card : InterplanetaryCinematics; let player : Player; let game : Game;
+  let card : InterplanetaryCinematics; let player : Player;
 
   beforeEach(function() {
     card = new InterplanetaryCinematics();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
@@ -22,9 +23,9 @@ describe('InterplanetaryCinematics', function() {
 
   it('Has onCardPlayed', function() {
     player.corporationCard = card;
-    card.onCardPlayed(player, game, new Bushes());
+    card.onCardPlayed(player, new Bushes());
     expect(player.megaCredits).to.eq(0);
-    card.onCardPlayed(player, game, new Virus());
+    card.onCardPlayed(player, new Virus());
     expect(player.megaCredits).to.eq(2);
   });
 });

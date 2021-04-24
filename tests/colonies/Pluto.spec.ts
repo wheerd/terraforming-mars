@@ -4,7 +4,7 @@ import {Pluto} from '../../src/colonies/Pluto';
 import {Game} from '../../src/Game';
 import {SelectCard} from '../../src/inputs/SelectCard';
 import {Player} from '../../src/Player';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('Pluto', function() {
   let pluto: Pluto; let player: Player; let player2: Player; let game: Game;
@@ -13,27 +13,27 @@ describe('Pluto', function() {
     pluto = new Pluto();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
     game.gameOptions.coloniesExtension = true;
     game.colonies.push(pluto);
   });
 
   it('Should build', function() {
-    pluto.addColony(player, game);
+    pluto.addColony(player);
     game.deferredActions.runAll(() => {}); // Draw cards
     expect(player.cardsInHand).has.lengthOf(2);
   });
 
   it('Should trade', function() {
-    pluto.trade(player, game);
+    pluto.trade(player);
     game.deferredActions.runAll(() => {}); // Draw cards
     expect(player.cardsInHand).has.lengthOf(1);
   });
 
   it('Should give trade bonus', function() {
-    pluto.addColony(player, game);
+    pluto.addColony(player);
 
-    pluto.trade(player2, game);
+    pluto.trade(player2);
 
     game.deferredActions.runAll(() => {});
 

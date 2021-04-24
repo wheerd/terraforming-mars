@@ -2,19 +2,20 @@ import {expect} from 'chai';
 import {JovianLanterns} from '../../../src/cards/colonies/JovianLanterns';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('JovianLanterns', function() {
-  let card : JovianLanterns; let player : Player; let game : Game;
+  let card : JovianLanterns; let player : Player;
 
   beforeEach(function() {
     card = new JovianLanterns();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
-    card.play(player, game);
+    card.play(player);
     expect(player.getTerraformRating()).to.eq(21);
   });
 

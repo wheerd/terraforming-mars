@@ -3,7 +3,7 @@ import {RestrictedArea} from '../../../src/cards/base/RestrictedArea';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('RestrictedArea', function() {
   let card : RestrictedArea; let player : Player; let game : Game;
@@ -11,7 +11,8 @@ describe('RestrictedArea', function() {
   beforeEach(function() {
     card = new RestrictedArea();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t act if not enough MC', function() {
@@ -20,7 +21,7 @@ describe('RestrictedArea', function() {
   });
 
   it('Should play', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
 
     const space = action.availableSpaces[0];
@@ -33,7 +34,7 @@ describe('RestrictedArea', function() {
   it('Should act', function() {
     player.megaCredits = 2;
     expect(card.canAct(player)).is.true;
-    card.action(player, game);
+    card.action(player);
 
     game.deferredActions.runNext();
     expect(player.megaCredits).to.eq(0);

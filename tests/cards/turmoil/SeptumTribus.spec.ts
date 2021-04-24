@@ -2,7 +2,8 @@ import {expect} from 'chai';
 import {SeptumTribus} from '../../../src/cards/turmoil/SeptumTribus';
 import {Game} from '../../../src/Game';
 import {PartyName} from '../../../src/turmoil/parties/PartyName';
-import {setCustomGameOptions, TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('SeptumTribus', function() {
   it('Should play', function() {
@@ -10,8 +11,8 @@ describe('SeptumTribus', function() {
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
 
-    const gameOptions = setCustomGameOptions();
-    const game = new Game('foobar', [player, player2], player, gameOptions);
+    const gameOptions = TestingUtils.setCustomGameOptions();
+    const game = Game.newInstance('foobar', [player, player2], player, gameOptions);
     card.play();
 
     player.corporationCard = card;
@@ -23,13 +24,13 @@ describe('SeptumTribus', function() {
     if (turmoil) {
       turmoil.sendDelegateToParty(player.id, PartyName.REDS, game);
       turmoil.sendDelegateToParty(player.id, PartyName.REDS, game);
-      card.action(player, game);
+      card.action(player);
       expect(player.megaCredits).to.eq(2);
 
       player.megaCredits = 0;
       turmoil.sendDelegateToParty(player.id, PartyName.KELVINISTS, game);
       turmoil.sendDelegateToParty(player.id, PartyName.GREENS, game);
-      card.action(player, game);
+      card.action(player);
       expect(player.megaCredits).to.eq(6);
     }
   });
@@ -38,11 +39,11 @@ describe('SeptumTribus', function() {
     const card = new SeptumTribus();
     const player = TestPlayers.BLUE.newPlayer();
 
-    const gameOptions = setCustomGameOptions({turmoilExtension: false});
-    const game = new Game('foobar', [player], player, gameOptions);
+    const gameOptions = TestingUtils.setCustomGameOptions({turmoilExtension: false});
+    Game.newInstance('foobar', [player], player, gameOptions);
     card.play();
 
     player.corporationCard = card;
-    expect(card.canAct(player, game)).is.not.true;
+    expect(card.canAct(player)).is.not.true;
   });
 });

@@ -6,7 +6,7 @@ import {FloatingHabs} from '../../../src/cards/venusNext/FloatingHabs';
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('FloaterTechnology', function() {
   let card : FloaterTechnology; let player : Player; let game : Game;
@@ -14,7 +14,8 @@ describe('FloaterTechnology', function() {
   beforeEach(function() {
     card = new FloaterTechnology();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can play', function() {
@@ -30,9 +31,9 @@ describe('FloaterTechnology', function() {
     const dirigibles = new Dirigibles();
     player.playedCards.push(dirigibles);
 
-    card.action(player, game);
+    card.action(player);
     expect(game.deferredActions).has.lengthOf(1);
-    const input = game.deferredActions.next()!.execute();
+    const input = game.deferredActions.peek()!.execute();
     expect(input).is.undefined;
     expect(dirigibles.resourceCount).to.eq(1);
   });
@@ -42,10 +43,10 @@ describe('FloaterTechnology', function() {
     const floatingHabs = new FloatingHabs();
     player.playedCards.push(dirigibles, floatingHabs);
 
-    card.action(player, game);
+    card.action(player);
     expect(game.deferredActions).has.lengthOf(1);
 
-    const selectCard = game.deferredActions.next()!.execute() as SelectCard<ICard>;
+    const selectCard = game.deferredActions.peek()!.execute() as SelectCard<ICard>;
     selectCard.cb([floatingHabs]);
     expect(floatingHabs.resourceCount).to.eq(1);
     expect(dirigibles.resourceCount).to.eq(0);

@@ -3,7 +3,7 @@ import {JetStreamMicroscrappers} from '../../../src/cards/venusNext/JetStreamMic
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('JetStreamMicroscrappers', function() {
   let card : JetStreamMicroscrappers; let player : Player; let game : Game;
@@ -11,7 +11,8 @@ describe('JetStreamMicroscrappers', function() {
   beforeEach(function() {
     card = new JetStreamMicroscrappers();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
@@ -25,13 +26,13 @@ describe('JetStreamMicroscrappers', function() {
 
     // only one action possible
     expect(card.resourceCount).to.eq(0);
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action).is.undefined;
     expect(card.resourceCount).to.eq(2);
     expect(player.titanium).to.eq(1);
 
     // both actions possible
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions).is.not.undefined;
     expect(orOptions instanceof OrOptions).is.true;
     orOptions.options[0].cb();

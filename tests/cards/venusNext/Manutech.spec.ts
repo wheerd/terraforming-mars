@@ -1,9 +1,10 @@
 import {expect} from 'chai';
+import {PowerPlantStandardProject} from '../../../src/cards/base/standardProjects/PowerPlantStandardProject';
 import {Manutech} from '../../../src/cards/venusNext/Manutech';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Manutech', function() {
   let card : Manutech; let player : Player; let game : Game;
@@ -11,7 +12,8 @@ describe('Manutech', function() {
   beforeEach(function() {
     card = new Manutech();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
     player.corporationCard = card;
   });
 
@@ -22,10 +24,8 @@ describe('Manutech', function() {
   });
 
   it('Should add energy resources by Power Plant standard project', function() {
-    const action = (player as any).buildPowerPlant(game);
-    expect(action).is.not.undefined;
-    action.cb();
-        game.deferredActions.shift()!.execute();
-        expect(player.getResource(Resources.ENERGY)).to.eq(1);
+    new PowerPlantStandardProject().action(player);
+    game.deferredActions.pop()!.execute();
+    expect(player.getResource(Resources.ENERGY)).to.eq(1);
   });
 });

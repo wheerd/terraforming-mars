@@ -4,14 +4,14 @@ import {Resources} from '../../src/Resources';
 import {RedInfluence} from '../../src/turmoil/globalEvents/RedInfluence';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('RedInfluence', function() {
   it('resolve play', function() {
     const card = new RedInfluence();
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
-    const game = new Game('foobar', [player, player2], player);
+    const game = Game.newInstance('foobar', [player, player2], player);
     const turmoil = Turmoil.newInstance(game);
 
     player.setTerraformRating(23);

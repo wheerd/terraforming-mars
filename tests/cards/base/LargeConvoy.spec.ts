@@ -5,19 +5,21 @@ import {Pets} from '../../../src/cards/base/Pets';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {maxOutOceans, TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('LargeConvoy', function() {
-  let card : LargeConvoy; let player : Player; let game : Game;
+  let card : LargeConvoy; let player : Player;
 
   beforeEach(function() {
     card = new LargeConvoy();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play without animal cards', function() {
-    card.play(player, game);
+    card.play(player);
 
     player.victoryPointsBreakdown.setVictoryPoints('victoryPoints', card.getVictoryPoints());
     expect(player.victoryPointsBreakdown.victoryPoints).to.eq(2);
@@ -29,10 +31,10 @@ describe('LargeConvoy', function() {
     const pets = new Pets();
     player.playedCards.push(pets);
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     player.playedCards.push(card);
     (action as OrOptions).options[1].cb();
-    player.getVictoryPoints(game);
+    player.getVictoryPoints();
 
     expect(player.victoryPointsBreakdown.victoryPoints).to.eq(4);
     expect(player.cardsInHand).has.lengthOf(2);
@@ -45,7 +47,7 @@ describe('LargeConvoy', function() {
     const fish = new Fish();
     player.playedCards.push(pets, fish);
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
 
     player.victoryPointsBreakdown.setVictoryPoints('victoryPoints', card.getVictoryPoints());
@@ -60,11 +62,11 @@ describe('LargeConvoy', function() {
   it('Should play without oceans', function() {
     const pets = new Pets();
     player.playedCards.push(pets);
-    maxOutOceans(player, game);
+    TestingUtils.maxOutOceans(player);
     const plantsCount = player.plants;
     const cardsInHand = player.cardsInHand.length;
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
 
     player.victoryPointsBreakdown.setVictoryPoints('victoryPoints', card.getVictoryPoints());

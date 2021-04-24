@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {MartianSurvey} from '../../../src/cards/prelude/MartianSurvey';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('MartianSurvey', function() {
   let card : MartianSurvey; let player : Player; let game : Game;
@@ -10,21 +10,21 @@ describe('MartianSurvey', function() {
   beforeEach(function() {
     card = new MartianSurvey();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player], player);
+    game = Game.newInstance('foobar', [player], player);
   });
 
-  it('Can\'t play', function() {
+  it('Cannot play', () => {
     (game as any).oxygenLevel = 5;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
+  });
+  it('Can play', () => {
+    (game as any).oxygenLevel = 4;
+    expect(card.canPlay(player)).is.true;
   });
 
-  it('Should play', function() {
-    expect(card.canPlay(player, game)).is.true;
-    card.play(player, game);
-    expect(game.deferredActions).has.lengthOf(1);
-
-    // Draw cards
-    game.deferredActions.runNext();
+  it('Should play', () => {
+    expect(card.canPlay(player)).is.true;
+    card.play(player);
 
     expect(card.getVictoryPoints()).to.eq(1);
     expect(player.cardsInHand).has.lengthOf(2);

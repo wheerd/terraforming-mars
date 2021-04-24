@@ -5,7 +5,7 @@ import {Research} from '../../../src/cards/base/Research';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('MarsUniversity', function() {
   let card : MarsUniversity; let player : Player; let game : Game;
@@ -13,22 +13,23 @@ describe('MarsUniversity', function() {
   beforeEach(function() {
     card = new MarsUniversity();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
     const action = card.play();
     expect(action).is.undefined;
 
-    expect(card.onCardPlayed(player, game, new Pets())).is.undefined;
+    expect(card.onCardPlayed(player, new Pets())).is.undefined;
     expect(game.deferredActions).has.lengthOf(0);
 
     player.cardsInHand.push(card);
-    card.onCardPlayed(player, game, card);
+    card.onCardPlayed(player, card);
     expect(game.deferredActions).has.lengthOf(1);
 
-    const orOptions = game.deferredActions.next()!.execute() as OrOptions;
-    game.deferredActions.shift();
+    const orOptions = game.deferredActions.peek()!.execute() as OrOptions;
+    game.deferredActions.pop();
     orOptions.options[0].cb([card]);
     expect(player.cardsInHand).has.lengthOf(1);
     expect(player.cardsInHand[0]).not.to.eq(card);
@@ -45,15 +46,15 @@ describe('MarsUniversity', function() {
 
   it('Runs twice for multiple science tags', function() {
     player.cardsInHand.push(card, card);
-    card.onCardPlayed(player, game, new Research());
+    card.onCardPlayed(player, new Research());
     expect(game.deferredActions).has.lengthOf(2);
 
-    const orOptions = game.deferredActions.next()!.execute() as OrOptions;
-    game.deferredActions.shift();
+    const orOptions = game.deferredActions.peek()!.execute() as OrOptions;
+    game.deferredActions.pop();
     orOptions.options[1].cb();
 
-    const orOptions2 = game.deferredActions.next()!.execute() as OrOptions;
-    game.deferredActions.shift();
+    const orOptions2 = game.deferredActions.peek()!.execute() as OrOptions;
+    game.deferredActions.pop();
     orOptions2.options[1].cb();
 
     expect(game.deferredActions).has.lengthOf(0);

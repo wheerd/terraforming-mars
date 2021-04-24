@@ -6,15 +6,16 @@ import {AgricolaInc} from '../../../src/cards/community/AgricolaInc';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('AgricolaInc', function() {
-  let card : AgricolaInc; let player : Player; let game : Game;
+  let card : AgricolaInc; let player : Player;
 
   beforeEach(function() {
     card = new AgricolaInc();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
 
     card.play(player);
     player.corporationCard = card;
@@ -26,9 +27,9 @@ describe('AgricolaInc', function() {
   });
 
   it('Scores endgame VP correctly', function() {
-    expect(card.getVictoryPoints(player, game)).to.eq(-18);
+    expect(card.getVictoryPoints(player)).to.eq(-18);
 
     player.playedCards.push(new SolarWindPower(), new Research(), new CoronaExtractor());
-    expect(card.getVictoryPoints(player, game)).to.eq(-11);
+    expect(card.getVictoryPoints(player)).to.eq(-11);
   });
 });

@@ -5,7 +5,7 @@ import {Virus} from '../../../src/cards/base/Virus';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Virus', function() {
   let card : Virus; let player : Player; let player2 : Player; let game : Game;
@@ -14,7 +14,7 @@ describe('Virus', function() {
     card = new Virus();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
   });
 
   it('Should play', function() {
@@ -25,7 +25,7 @@ describe('Virus', function() {
     player.addResourceTo(predators);
     player.plants = 5;
 
-    const orOptions = card.play(player2, game) as OrOptions;
+    const orOptions = card.play(player2) as OrOptions;
     expect(orOptions instanceof OrOptions).is.true;
 
     orOptions.options[0].cb([player.playedCards[0]]);
@@ -37,11 +37,14 @@ describe('Virus', function() {
 
   it('Can play when no other player has resources', function() {
     player.plants = 5;
-    expect(card.play(player, game)).is.undefined;
+    expect(card.play(player)).is.undefined;
     expect(player.plants).to.eq(5);
   });
 
-  it('Should play', function() {
-    expect(card.canPlay()).is.true;
+  it('Works in solo mode', function() {
+    game = Game.newInstance('foobar', [player], player);
+    expect(card.canPlay(player)).is.true;
+    expect(card.play(player)).is.undefined;
+    expect(game.someoneHasRemovedOtherPlayersPlants).is.true;
   });
 });

@@ -1,5 +1,5 @@
 export enum Tags {
-    STEEL = 'building',
+    BUILDING = 'building',
     SPACE = 'space',
     SCIENCE = 'science',
     ENERGY = 'power',
@@ -7,9 +7,10 @@ export enum Tags {
     JOVIAN = 'jovian',
     VENUS = 'venus',
     PLANT = 'plant',
-    MICROBES = 'microbe',
+    MICROBE = 'microbe',
     ANIMAL = 'animal',
     CITY = 'city',
     WILDCARD = 'wild',
+    MOON = 'moon',
     EVENT = 'event',
 }

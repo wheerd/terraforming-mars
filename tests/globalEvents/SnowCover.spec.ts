@@ -5,7 +5,7 @@ import {Player} from '../../src/Player';
 import {SnowCover} from '../../src/turmoil/globalEvents/SnowCover';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('SnowCover', function() {
   let card : SnowCover; let player : Player; let player2: Player; let game : Game; let turmoil: Turmoil;
@@ -14,7 +14,7 @@ describe('SnowCover', function() {
     card = new SnowCover();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
 
     turmoil = Turmoil.newInstance(game);
     turmoil.chairman = player2.id;

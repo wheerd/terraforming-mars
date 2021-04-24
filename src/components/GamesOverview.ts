@@ -2,9 +2,12 @@ import Vue from 'vue';
 
 import {Phase} from '../Phase';
 
+import * as constants from '../constants';
+
 export const GamesOverview = Vue.component('games-overview', {
   data: function() {
     return {
+      constants,
       serverId: '',
       games: {},
     };
@@ -26,7 +29,7 @@ export const GamesOverview = Vue.component('games-overview', {
           const result = xhr.response;
           if (result instanceof Array) {
             result.forEach(function(gameId) {
-              (vueApp as any).getGame(gameId);
+              (vueApp as any).getGame(gameId.id);
             });
           } else {
             alert('Unexpected response fetching games from API');
@@ -66,7 +69,7 @@ export const GamesOverview = Vue.component('games-overview', {
   },
   template: `
         <div id="games-overview">
-            <h1>Terraforming Mars — Games Overview</h1>
+            <h1>{{ constants.APP_NAME }} — Games Overview</h1>
             <p>The following games are available on this server:</p>
             <ul>
                 <li v-for="game in games">

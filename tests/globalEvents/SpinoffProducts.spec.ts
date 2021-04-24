@@ -5,14 +5,14 @@ import {Resources} from '../../src/Resources';
 import {SpinoffProducts} from '../../src/turmoil/globalEvents/SpinoffProducts';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('SpinoffProducts', function() {
   it('resolve play', function() {
     const card = new SpinoffProducts();
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
-    const game = new Game('foobar', [player, player2], player);
+    const game = Game.newInstance('foobar', [player, player2], player);
     const turmoil = Turmoil.newInstance(game);
 
     turmoil.initGlobalEvent(game);

@@ -10,16 +10,35 @@ import {Colony} from '../../colonies/Colony';
 import {SelectColony} from '../../inputs/SelectColony';
 import {ColonyName} from '../../colonies/ColonyName';
 import {ColonyModel} from '../../models/ColonyModel';
+import {Card} from '../Card';
+import {CardRenderer} from '../render/CardRenderer';
 
-export class Aridor implements CorporationCard {
-    public name = CardName.ARIDOR;
-    public tags = [];
-    public startingMegaCredits: number = 40;
+export class Aridor extends Card implements CorporationCard {
+  constructor() {
+    super({
+      name: CardName.ARIDOR,
+      startingMegaCredits: 40,
+      cardType: CardType.CORPORATION,
+      initialActionText: 'Add a colony tile',
+
+      metadata: {
+        cardNumber: 'R20',
+        description: 'You start with 40MC. As your first action, put an additional Colony Tile of your choice into play',
+        renderData: CardRenderer.builder((b) => {
+          b.br.br;
+          b.megacredits(40).nbsp.placeColony();
+          b.corpBox('effect', (ce) => {
+            ce.effect('When you get a new type of tag in play [event cards do not count], increase your M€ production 1 step.', (eb) => {
+              eb.diverseTag().startEffect.production((pb) => pb.megacredits(1));
+            });
+          });
+        }),
+      },
+    });
+  }
     public allTags = new Set<Tags>();
-    public cardType = CardType.CORPORATION;
-
-    public initialActionText: string = 'Add a colony tile';
-    public initialAction(player: Player, game: Game) {
+    public initialAction(player: Player) {
+      const game = player.game;
       if (game.colonyDealer === undefined || !game.gameOptions.coloniesExtension) return undefined;
 
       const availableColonies: Colony[] = game.colonyDealer.discardedColonies;
@@ -60,14 +79,19 @@ export class Aridor implements CorporationCard {
       });
     }
 
-    public onCardPlayed(player: Player, _game: Game, card: IProjectCard) {
-      if (card.cardType === CardType.EVENT || card.tags.filter((tag) => tag !== Tags.WILDCARD).length === 0 || !player.isCorporation(this.name)) return undefined;
+    public onCardPlayed(player: Player, card: IProjectCard) {
+      if (
+        card.cardType === CardType.EVENT ||
+        card.tags.filter((tag) => tag !== Tags.WILDCARD).length === 0 ||
+        !player.isCorporation(this.name)) {
+        return undefined;
+      }
 
       for (const tag of card.tags.filter((tag) => tag !== Tags.WILDCARD)) {
         const currentSize = this.allTags.size;
         this.allTags.add(tag);
         if (this.allTags.size > currentSize) {
-          player.addProduction(Resources.MEGACREDITS);
+          player.addProduction(Resources.MEGACREDITS, 1);
         }
       }
       return undefined;

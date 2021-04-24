@@ -4,15 +4,16 @@ import {Tags} from '../../../src/cards/Tags';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('AsteroidDeflectionSystem', function() {
-  let card : AsteroidDeflectionSystem; let player : Player; let game : Game;
+  let card : AsteroidDeflectionSystem; let player : Player;
 
   beforeEach(function() {
     card = new AsteroidDeflectionSystem();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -20,7 +21,7 @@ describe('AsteroidDeflectionSystem', function() {
   });
 
   it('Should play', function() {
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     expect(card.canPlay(player)).is.true;
 
     card.play(player);
@@ -31,8 +32,8 @@ describe('AsteroidDeflectionSystem', function() {
     player.playedCards.push(card);
     expect(card.canAct()).is.true;
 
-    while (game.dealer.discarded.find((card) => card.tags.includes(Tags.SPACE)) === undefined) {
-      card.action(player, game);
+    while (player.game.dealer.discarded.find((card) => card.tags.includes(Tags.SPACE)) === undefined) {
+      card.action(player);
     }
 
     expect(card.resourceCount).to.eq(1);

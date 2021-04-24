@@ -10,7 +10,7 @@ import {InterplanetaryTrade} from '../../../src/cards/promo/InterplanetaryTrade'
 import {MaxwellBase} from '../../../src/cards/venusNext/MaxwellBase';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('InterplanetaryTrade', function() {
   let card : InterplanetaryTrade; let player : Player;
@@ -41,7 +41,7 @@ describe('InterplanetaryTrade', function() {
     player.playedCards.push(new ColonizerTrainingCamp());
 
     card.play(player);
-    expect(player.getProduction(Resources.MEGACREDITS)).to.eq(11);
+    expect(player.getProduction(Resources.MEGACREDITS)).to.eq(12);
   });
 
   it('Should give victory points', function() {

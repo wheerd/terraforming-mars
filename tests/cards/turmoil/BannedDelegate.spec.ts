@@ -6,7 +6,8 @@ import {SelectDelegate} from '../../../src/inputs/SelectDelegate';
 import {Player} from '../../../src/Player';
 import {PartyName} from '../../../src/turmoil/parties/PartyName';
 import {Turmoil} from '../../../src/turmoil/Turmoil';
-import {setCustomGameOptions, TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Banned Delegate', function() {
   let card : BannedDelegate; let player : Player; let player2 : Player; let game : Game; let turmoil: Turmoil;
@@ -16,26 +17,26 @@ describe('Banned Delegate', function() {
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
 
-    const gameOptions = setCustomGameOptions();
-    game = new Game('foobar', [player, player2], player, gameOptions);
+    const gameOptions = TestingUtils.setCustomGameOptions();
+    game = Game.newInstance('foobar', [player, player2], player, gameOptions);
     turmoil = game.turmoil!;
   });
 
   it('Can\'t play', function() {
     turmoil.chairman = player2.id;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     turmoil.chairman = player.id;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
     const greens = turmoil.getPartyByName(PartyName.GREENS)!;
     turmoil.sendDelegateToParty(player.id, PartyName.GREENS, game);
     turmoil.sendDelegateToParty(player2.id, PartyName.GREENS, game);
     const initialDelegatesCount = greens.delegates.length;
 
-    const result = card.play(player, game);
+    const result = card.play(player);
 
     if (result instanceof SelectDelegate) {
       const selectDelegate = result as SelectDelegate;

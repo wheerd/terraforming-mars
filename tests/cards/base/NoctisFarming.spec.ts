@@ -3,7 +3,7 @@ import {NoctisFarming} from '../../../src/cards/base/NoctisFarming';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('NoctisFarming', function() {
   let card : NoctisFarming; let player : Player; let game : Game;
@@ -11,16 +11,17 @@ describe('NoctisFarming', function() {
   beforeEach(function() {
     card = new NoctisFarming();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).temperature = -20;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
     card.play(player);
     expect(player.getProduction(Resources.MEGACREDITS)).to.eq(1);

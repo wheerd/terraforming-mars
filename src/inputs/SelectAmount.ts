@@ -8,9 +8,10 @@ export class SelectAmount implements PlayerInput {
     constructor(
         public title: string | Message,
         public buttonLabel: string = 'Save',
-        public cb: (amount: number) => undefined,
+        public cb: (amount: number) => undefined | PlayerInput,
         public min: number,
         public max: number,
+        public maxByDefault?: boolean,
     ) {
       this.buttonLabel = buttonLabel;
     }

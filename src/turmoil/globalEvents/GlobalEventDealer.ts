@@ -39,6 +39,7 @@ import {CloudSocieties} from './CloudSocieties';
 import {MicrogravityHealthProblems} from './MicrogravityHealthProblems';
 import {SerializedGlobalEventDealer} from './SerializedGlobalEventDealer';
 import {ISerializable} from '../../ISerializable';
+import {LeadershipSummit} from './LeadershipSummit';
 
 export interface IGlobalEventFactory<T> {
     globalEventName: GlobalEventName;
@@ -104,6 +105,10 @@ export const NEGATIVE_GLOBAL_EVENTS: Array<IGlobalEventFactory<IGlobalEvent>> = 
   {globalEventName: GlobalEventName.SOLAR_FLARE, Factory: SolarFlare},
 ];
 
+export const COMMUNITY_GLOBAL_EVENTS: Array<IGlobalEventFactory<IGlobalEvent>> = [
+  {globalEventName: GlobalEventName.LEADERSHIP_SUMMIT, Factory: LeadershipSummit},
+];
+
 const ALL_EVENTS = [
   ...POSITIVE_GLOBAL_EVENTS,
   ...NEGATIVE_GLOBAL_EVENTS,
@@ -112,6 +117,7 @@ const ALL_EVENTS = [
   ...VENUS_COLONY_POSITIVE_GLOBAL_EVENTS,
   ...VENUS_COLONY_NEGATIVE_GLOBAL_EVENTS,
   ...VENUS_POSITIVE_GLOBAL_EVENTS,
+  ...COMMUNITY_GLOBAL_EVENTS,
 ];
 // Function to return a global event object by its name
 export function getGlobalEventByName(globalEventName: string): IGlobalEvent | undefined {
@@ -146,6 +152,8 @@ export class GlobalEventDealer implements ISerializable<SerializedGlobalEventDea
       events.push(...VENUS_COLONY_POSITIVE_GLOBAL_EVENTS);
     }
 
+    if (game.gameOptions.communityCardsOption) events.push(...COMMUNITY_GLOBAL_EVENTS);
+
     const globalEventsDeck = this.shuffle(events.map((cf) => new cf.Factory()));
     return new GlobalEventDealer(globalEventsDeck, []);
   };
@@ -169,31 +177,17 @@ export class GlobalEventDealer implements ISerializable<SerializedGlobalEventDea
     return {
       deck: this.globalEventsDeck.map((card) => card.name),
       discarded: this.discardedGlobalEvents.map((card) => card.name),
-    } as SerializedGlobalEventDealer;
+    };
   }
 
-  public static deserialize(d: GlobalEventDealer | SerializedGlobalEventDealer): GlobalEventDealer {
-    function instanceOfGlobalEventDealer(object: any): object is GlobalEventDealer {
-      return 'discardedGlobalEvents' in object;
-    }
-    if (instanceOfGlobalEventDealer(d)) {
-      const deck = d.globalEventsDeck.map((element: IGlobalEvent) => {
-        return getGlobalEventByName(element.name)!;
-      });
+  public static deserialize(d: SerializedGlobalEventDealer): GlobalEventDealer {
+    const deck = d.deck.map((element: GlobalEventName) => {
+      return getGlobalEventByName(element)!;
+    });
 
-      const discardPile = d.discardedGlobalEvents.map((element: IGlobalEvent) => {
-        return getGlobalEventByName(element.name)!;
-      });
-      return new GlobalEventDealer(deck, discardPile);
-    } else {
-      const deck = d.deck.map((element: GlobalEventName) => {
-        return getGlobalEventByName(element)!;
-      });
-
-      const discardPile = d.discarded.map((element: GlobalEventName) => {
-        return getGlobalEventByName(element)!;
-      });
-      return new GlobalEventDealer(deck, discardPile);
-    }
+    const discardPile = d.discarded.map((element: GlobalEventName) => {
+      return getGlobalEventByName(element)!;
+    });
+    return new GlobalEventDealer(deck, discardPile);
   }
 }

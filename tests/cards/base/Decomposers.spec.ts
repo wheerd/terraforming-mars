@@ -4,7 +4,7 @@ import {Birds} from '../../../src/cards/base/Birds';
 import {Decomposers} from '../../../src/cards/base/Decomposers';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Decomposers', function() {
   let card : Decomposers; let player : Player; let game : Game;
@@ -12,23 +12,24 @@ describe('Decomposers', function() {
   beforeEach(function() {
     card = new Decomposers();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).oxygenLevel = 3;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
     card.play();
 
-    card.onCardPlayed(player, game, new Birds());
+    card.onCardPlayed(player, new Birds());
     expect(card.resourceCount).to.eq(1);
-    card.onCardPlayed(player, game, card);
+    card.onCardPlayed(player, card);
     expect(card.resourceCount).to.eq(2);
-    card.onCardPlayed(player, game, new Algae());
+    card.onCardPlayed(player, new Algae());
 
     expect(card.resourceCount).to.eq(3);
     expect(card.getVictoryPoints()).to.eq(1);

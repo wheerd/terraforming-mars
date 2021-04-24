@@ -2,7 +2,7 @@
 import {Message} from '../Message';
 import {OrOptions} from './OrOptions';
 import {PlayerInput} from '../PlayerInput';
-import {ISpace} from '../ISpace';
+import {ISpace} from '../boards/ISpace';
 import {PlayerInputTypes} from '../PlayerInputTypes';
 
 export class SelectSpace implements PlayerInput {
@@ -13,7 +13,7 @@ export class SelectSpace implements PlayerInput {
         public availableSpaces: Array<ISpace>,
         public cb: (space: ISpace) => OrOptions | SelectSpace | undefined) {
       if (availableSpaces.length === 0) {
-        throw 'No available spaces';
+        throw new Error('No available spaces');
       }
     }
 }

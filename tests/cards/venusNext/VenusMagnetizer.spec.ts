@@ -3,7 +3,7 @@ import {VenusMagnetizer} from '../../../src/cards/venusNext/VenusMagnetizer';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('VenusMagnetizer', function() {
   let card : VenusMagnetizer; let player : Player; let game : Game;
@@ -11,17 +11,18 @@ describe('VenusMagnetizer', function() {
   beforeEach(function() {
     card = new VenusMagnetizer();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
     (game as any).venusScaleLevel = 8;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).venusScaleLevel = 10;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
     expect(card.play()).is.undefined;
   });
 
@@ -29,7 +30,7 @@ describe('VenusMagnetizer', function() {
     player.addProduction(Resources.ENERGY, 2);
     player.playedCards.push(card);
 
-    card.action(player, game);
+    card.action(player);
     expect(player.getProduction(Resources.ENERGY)).to.eq(1);
     expect(game.getVenusScaleLevel()).to.eq(2);
   });

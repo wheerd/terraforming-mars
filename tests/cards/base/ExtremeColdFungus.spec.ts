@@ -5,33 +5,38 @@ import {Tardigrades} from '../../../src/cards/base/Tardigrades';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
-describe('ExtremeColdFungus', function() {
+describe('ExtremeColdFungus', () => {
   let card : ExtremeColdFungus; let player : Player; let player2 : Player; let game : Game;
 
-  beforeEach(function() {
+  beforeEach(() => {
     card = new ExtremeColdFungus();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
   });
 
-  it('Can\'t play', function() {
+  it('Cannot play', () => {
     (game as any).temperature = -8;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Should play', function() {
+  it('Can play', () => {
+    (game as any).temperature = -12;
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('Should play', () => {
     const action = card.play();
     expect(action).is.undefined;
   });
 
-  it('Should act - single target', function() {
+  it('Should act - single target', () => {
     const tardigrades = new Tardigrades();
     player.playedCards.push(tardigrades);
 
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action instanceof OrOptions).is.true;
     expect(action!.options).has.lengthOf(2);
 
@@ -42,12 +47,12 @@ describe('ExtremeColdFungus', function() {
         expect(player.plants).to.eq(1);
   });
 
-  it('Should act - multiple targets', function() {
+  it('Should act - multiple targets', () => {
     const tardigrades = new Tardigrades();
     const ants = new Ants();
     player.playedCards.push(tardigrades, ants);
 
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action instanceof OrOptions).is.true;
     expect(action!.options).has.lengthOf(2);
 

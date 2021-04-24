@@ -5,14 +5,14 @@ import {Game} from '../../src/Game';
 import {MicrogravityHealthProblems} from '../../src/turmoil/globalEvents/MicrogravityHealthProblems';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('MicrogravityHealthProblems', function() {
   it('resolve play', function() {
     const card = new MicrogravityHealthProblems();
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
-    const game = new Game('foobar', [player, player2], player);
+    const game = Game.newInstance('foobar', [player, player2], player);
     const turmoil = Turmoil.newInstance(game);
     const colony1 = new Luna();
     const colony2 = new Triton();

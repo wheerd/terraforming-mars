@@ -6,26 +6,27 @@ import {Helion} from '../../../src/cards/corporation/Helion';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('LocalHeatTrapping', function() {
-  let card : LocalHeatTrapping; let player : Player; let game : Game;
+  let card : LocalHeatTrapping; let player : Player;
 
   beforeEach(function() {
     card = new LocalHeatTrapping();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play without 5 heat', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play - no animal targets', function() {
     player.heat = 5;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    card.play(player, game);
+    card.play(player);
     player.playedCards.push(card);
     expect(player.plants).to.eq(4);
     expect(player.heat).to.eq(0);
@@ -36,7 +37,7 @@ describe('LocalHeatTrapping', function() {
     const pets = new Pets();
     player.playedCards.push(card, pets);
 
-    const orOptions = card.play(player, game) as OrOptions;
+    const orOptions = card.play(player) as OrOptions;
     expect(orOptions).is.not.undefined;
     expect(orOptions instanceof OrOptions).is.true;
 
@@ -54,7 +55,7 @@ describe('LocalHeatTrapping', function() {
     const fish = new Fish();
     player.playedCards.push(card, pets, fish);
 
-    const orOptions = card.play(player, game) as OrOptions;
+    const orOptions = card.play(player) as OrOptions;
     expect(player.heat).to.eq(0);
     orOptions.options[1].cb([fish]);
     expect(player.getResourcesOnCard(fish)).to.eq(2);
@@ -67,6 +68,6 @@ describe('LocalHeatTrapping', function() {
 
     player.megaCredits = 0;
     player.heat = 5; // have to pay for card with 1 heat
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 });

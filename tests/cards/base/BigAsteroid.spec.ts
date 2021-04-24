@@ -3,7 +3,7 @@ import {BigAsteroid} from '../../../src/cards/base/BigAsteroid';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('BigAsteroid', function() {
   let card : BigAsteroid; let player : Player; let player2 : Player; let game : Game;
@@ -12,15 +12,15 @@ describe('BigAsteroid', function() {
     card = new BigAsteroid();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
   });
 
   it('Should play', function() {
     player2.plants = 5;
-    card.play(player, game);
+    card.play(player);
     expect(game.deferredActions).has.lengthOf(1);
 
-    const orOptions = game.deferredActions.next()!.execute() as OrOptions;
+    const orOptions = game.deferredActions.peek()!.execute() as OrOptions;
     orOptions.options[1].cb(); // do nothing
     expect(player2.plants).to.eq(5);
 
@@ -31,11 +31,11 @@ describe('BigAsteroid', function() {
   });
 
   it('Works fine in solo', function() {
-    game = new Game('foobar', [player], player);
+    game = Game.newInstance('foobar', [player], player);
     player.plants = 5;
-    card.play(player, game);
+    card.play(player);
     expect(game.deferredActions).has.lengthOf(1);
-    const input = game.deferredActions.next()!.execute();
+    const input = game.deferredActions.peek()!.execute();
     expect(input).is.undefined;
 
     expect(player.plants).to.eq(5);

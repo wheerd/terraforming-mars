@@ -2,14 +2,15 @@ import {expect} from 'chai';
 import {NuclearZone} from '../../../src/cards/base/NuclearZone';
 import {Game} from '../../../src/Game';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('NuclearZone', function() {
   it('Should play', function() {
     const card = new NuclearZone();
     const player = TestPlayers.BLUE.newPlayer();
-    const game = new Game('foobar', [player, player], player);
-    const action = card.play(player, game);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    const game = Game.newInstance('foobar', [player, redPlayer], player);
+    const action = card.play(player);
     if (action !== undefined) {
       const space = action.availableSpaces[0];
       action.cb(space);

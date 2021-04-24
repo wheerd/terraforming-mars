@@ -3,29 +3,30 @@ import {AtmoCollectors} from '../../../src/cards/colonies/AtmoCollectors';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('AtmoCollectors', function() {
-  let card : AtmoCollectors; let player : Player; let game : Game;
+  let card : AtmoCollectors; let player : Player;
 
   beforeEach(function() {
     card = new AtmoCollectors();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.undefined;
   });
 
   it('Should act', function() {
     player.playedCards.push(card);
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action).is.undefined;
     expect(card.resourceCount).to.eq(1);
 
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions).is.not.undefined;
     expect(orOptions instanceof OrOptions).is.true;
 

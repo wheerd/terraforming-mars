@@ -7,43 +7,51 @@ import {StratosphericBirds} from '../../../src/cards/venusNext/StratosphericBird
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
-describe('StratosphericBirds', function() {
+describe('StratosphericBirds', () => {
   let card : StratosphericBirds; let player : Player; let game : Game; let deuteriumExport: DeuteriumExport;
 
-  beforeEach(function() {
+  beforeEach(() => {
     card = new StratosphericBirds();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
     deuteriumExport = new DeuteriumExport();
   });
 
-  it('Can\'t play if Venus requirement not met', function() {
+  it('Cannot play if Venus requirement not met', () => {
     player.playedCards.push(deuteriumExport);
     player.addResourceTo(deuteriumExport, 1);
     (game as any).venusScaleLevel = 10;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Can\'t play if no floater', function() {
+  it('Cannot play if no floater', () => {
     (game as any).venusScaleLevel = 12;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Should play', function() {
+  it('Can play', () => {
     player.playedCards.push(deuteriumExport);
     player.addResourceTo(deuteriumExport, 1);
     (game as any).venusScaleLevel = 12;
-    expect(card.canPlay(player, game)).is.true;
-    player.playedCards.push(card);
-
-    card.play(player, game);
-    expect(game.deferredActions).has.lengthOf(1);
-    expect(game.deferredActions.shift()!.execute()).is.undefined;
+    expect(card.canPlay(player)).is.true;
   });
 
-  it('Should act', function() {
+  it('Should play', () => {
+    player.playedCards.push(deuteriumExport);
+    player.addResourceTo(deuteriumExport, 1);
+    (game as any).venusScaleLevel = 12;
+    expect(card.canPlay(player)).is.true;
+    player.playedCards.push(card);
+
+    card.play(player);
+    expect(game.deferredActions).has.lengthOf(1);
+    expect(game.deferredActions.pop()!.execute()).is.undefined;
+  });
+
+  it('Should act', () => {
     player.playedCards.push(card);
     card.action(player);
     expect(player.getResourcesOnCard(card)).to.eq(1);
@@ -52,7 +60,7 @@ describe('StratosphericBirds', function() {
     expect(card.getVictoryPoints()).to.eq(8);
   });
 
-  it('Allows to choose card to remove floater from', function() {
+  it('Allows to choose card to remove floater from', () => {
     const extractorBalloons = new ExtractorBalloons();
 
     // Add cards to remove floater from
@@ -60,8 +68,8 @@ describe('StratosphericBirds', function() {
     player.addResourceTo(deuteriumExport, 1);
     player.addResourceTo(extractorBalloons, 1);
 
-    card.play(player, game);
-    const selectCard = game.deferredActions.shift()!.execute() as SelectCard<ICard>;
+    card.play(player);
+    const selectCard = game.deferredActions.pop()!.execute() as SelectCard<ICard>;
     expect(selectCard.cards).has.lengthOf(2);
 
     selectCard.cb([deuteriumExport]);
@@ -69,7 +77,7 @@ describe('StratosphericBirds', function() {
     expect(player.getResourcesOnCard(extractorBalloons)).to.eq(1);
   });
 
-  it('Edge case: Dirigibles with no other floater cards', function() {
+  it('Edge case: Dirigibles with no other floater cards', () => {
     // Add dirigibles with 1 floater
     const dirigibles = new Dirigibles();
     player.playedCards.push(dirigibles);
@@ -78,27 +86,27 @@ describe('StratosphericBirds', function() {
     (game as any).venusScaleLevel = 12;
     player.megaCredits = 9;
 
-    // 9 MC + 1 Dirigibles floater: Cannot play
-    expect(card.canPlay(player, game)).is.not.true;
+    // 9 M€ + 1 Dirigibles floater: Cannot play
+    expect(card.canPlay(player)).is.not.true;
 
 
-    // 12 MC + 1 Dirigibles floater: Card is playable
+    // 12 M€ + 1 Dirigibles floater: Card is playable
     player.megaCredits = 12;
-    const selectHowToPayForCard = player.playProjectCard(game);
-    expect(card.canPlay(player, game)).is.true;
+    const SelectHowToPayForProjectCard = player.playProjectCard();
+    expect(card.canPlay(player)).is.true;
 
     // Try to spend floater to pay for card: Throw an error
-    expect(function() {
-      selectHowToPayForCard.cb(card, {steel: 0, heat: 0, titanium: 0, megaCredits: 9, microbes: 0, floaters: 1});
+    expect(() => {
+      SelectHowToPayForProjectCard.cb(card, {steel: 0, heat: 0, titanium: 0, megaCredits: 9, microbes: 0, floaters: 1});
     }).to.throw('Cannot spend all floaters to play Stratospheric Birds');
 
     // Pay with MC only: Can play
-    selectHowToPayForCard.cb(card, {steel: 0, heat: 0, titanium: 0, megaCredits: 12, microbes: 0, floaters: 0});
-        game.deferredActions.shift()!.execute(); // Remove floater
+    SelectHowToPayForProjectCard.cb(card, {steel: 0, heat: 0, titanium: 0, megaCredits: 12, microbes: 0, floaters: 0});
+        game.deferredActions.pop()!.execute(); // Remove floater
         expect(dirigibles.resourceCount).to.eq(0);
   });
 
-  it('Allow spending all floaters from Dirigibles if there\'s at least one other card with a floater', function() {
+  it('Allow spending all floaters from Dirigibles if there\'s at least one other card with a floater', () => {
     const dirigibles = new Dirigibles();
     player.playedCards.push(deuteriumExport, dirigibles);
     player.addResourceTo(deuteriumExport, 1);
@@ -107,12 +115,12 @@ describe('StratosphericBirds', function() {
     (game as any).venusScaleLevel = 12;
     player.megaCredits = 3;
 
-    const selectHowToPayForCard = player.playProjectCard(game);
-    expect(card.canPlay(player, game)).is.true;
+    const selectHowToPayForCard = player.playProjectCard();
+    expect(card.canPlay(player)).is.true;
 
     // Spend all 3 floaters from Dirigibles to pay for the card
     selectHowToPayForCard.cb(card, {steel: 0, heat: 0, titanium: 0, megaCredits: 3, microbes: 0, floaters: 3});
-        game.deferredActions.shift()!.execute(); // Remove floater
+        game.deferredActions.pop()!.execute(); // Remove floater
         expect(player.getResourcesOnCard(dirigibles)).to.eq(0);
         expect(player.getResourcesOnCard(deuteriumExport)).to.eq(0);
         expect(player.megaCredits).to.eq(0);

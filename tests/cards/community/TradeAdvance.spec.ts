@@ -3,8 +3,8 @@ import {TradeAdvance} from '../../../src/cards/community/TradeAdvance';
 import {ColonyName} from '../../../src/colonies/ColonyName';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {setCustomGameOptions} from '../../TestingUtils';
-import {TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('TradeAdvance', function() {
   let card : TradeAdvance; let player : Player; let game : Game;
@@ -12,18 +12,18 @@ describe('TradeAdvance', function() {
   beforeEach(function() {
     card = new TradeAdvance();
     player = TestPlayers.BLUE.newPlayer();
-
-    const gameOptions = setCustomGameOptions({
+    const redPlayer = TestPlayers.RED.newPlayer();
+    const gameOptions = TestingUtils.setCustomGameOptions({
       coloniesExtension: true,
       customColoniesList: [ColonyName.LUNA, ColonyName.CALLISTO, ColonyName.CERES, ColonyName.IO, ColonyName.TITAN],
     });
-    game = new Game('foobar', [player, player], player, gameOptions);
+    game = Game.newInstance('foobar', [player, redPlayer], player, gameOptions);
   });
 
   it('Should play', function() {
-    card.play(player, game);
+    card.play(player);
 
-    game.deferredActions.runAll(() => {});
+    player.game.deferredActions.runAll(() => {});
 
     expect(player.megaCredits).to.eq(6); // 2 from card + 4 from Luna
     expect(player.energy).to.eq(3);

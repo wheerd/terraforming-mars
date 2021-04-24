@@ -1,4 +1,4 @@
-// Common code for SelectHowToPay and SelectHowToPayForCard
+// Common code for SelectHowToPay and SelectHowToPayForProjectCard
 import {CardName} from '../CardName';
 import {CardModel} from '../models/CardModel';
 import {ResourceType} from '../ResourceType';
@@ -32,7 +32,6 @@ export const PaymentWidgetMixin = {
     },
     reduceValue: function(target: string, to: number): void {
       const currentValue: number = (this as any)[target];
-      const isResearchPhase = (this as any).$data.isResearchPhase;
 
       if (currentValue === 0) return;
 
@@ -41,21 +40,14 @@ export const PaymentWidgetMixin = {
 
       if (target === 'megaCredits' || realTo === 0) return;
 
-      this.setRemainingMCValue(isResearchPhase);
+      this.setRemainingMCValue();
     },
-    addValue: function(target: string, to: number): void {
+    addValue: function(target: string, to: number, max?: number): void {
       const currentValue: number = (this as any)[target];
-      let maxValue: number = (this as any).player[target];
-      const isResearchPhase = (this as any).$data.isResearchPhase;
+      let maxValue: number = max ?? (this as any).player[target];
 
-      if (isResearchPhase && target === 'megaCredits') {
-        maxValue = (this as any).player.cardCost * 4;
-      } else if (target === 'megaCredits') {
+      if (target === 'megaCredits') {
         maxValue = this.getMegaCreditsMax();
-      }
-
-      if (isResearchPhase && target === 'heat') {
-        maxValue = (this as any).player.cardCost * 4;
       }
 
       if (target === 'microbes') maxValue = (this as any).playerinput.microbes;
@@ -70,9 +62,9 @@ export const PaymentWidgetMixin = {
 
       if (target === 'megaCredits' || realTo === 0) return;
 
-      this.setRemainingMCValue(isResearchPhase);
+      this.setRemainingMCValue();
     },
-    setRemainingMCValue: function(isResearchPhase: boolean): void {
+    setRemainingMCValue: function(): void {
       const remainingMC: number = (this as any).$data.cost -
               (this as any)['heat'] -
               (this as any)['titanium'] * this.getResourceRate('titanium') -
@@ -80,16 +72,12 @@ export const PaymentWidgetMixin = {
               (this as any)['microbes'] * this.getResourceRate('microbes') -
               (this as any)['floaters'] * this.getResourceRate('floaters');
 
-      if (isResearchPhase) {
-        (this as any)['megaCredits'] = Math.max(0, (this as any).player.cardCost * 4 - (this as any)['heat']);
-      } else {
-        (this as any)['megaCredits'] = Math.max(0, Math.min(this.getMegaCreditsMax(), remainingMC));
-      }
+      (this as any)['megaCredits'] = Math.max(0, Math.min(this.getMegaCreditsMax(), remainingMC));
     },
-    setMaxValue: function(target: string): void {
+    setMaxValue: function(target: string, max?: number): void {
       let currentValue: number = (this as any)[target];
       const cardCost: number = (this as any).$data.cost;
-      let amountHave: number = (this as any).player[target];
+      let amountHave: number = max ?? (this as any).player[target];
 
       let amountNeed: number = cardCost;
       if (['titanium', 'steel', 'microbes', 'floaters'].includes(target)) {
@@ -103,7 +91,7 @@ export const PaymentWidgetMixin = {
       }
 
       while (currentValue < amountHave && currentValue < amountNeed) {
-        this.addValue(target, 1);
+        this.addValue(target, 1, max);
         currentValue++;
       }
     },

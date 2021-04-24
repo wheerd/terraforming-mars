@@ -8,14 +8,14 @@ import {Resources} from '../../src/Resources';
 import {ParadigmBreakdown} from '../../src/turmoil/globalEvents/ParadigmBreakdown';
 import {Kelvinists} from '../../src/turmoil/parties/Kelvinists';
 import {Turmoil} from '../../src/turmoil/Turmoil';
-import {TestPlayers} from '../TestingUtils';
+import {TestPlayers} from '../TestPlayers';
 
 describe('ParadigmBreakdown', function() {
   it('resolve play', function() {
     const card = new ParadigmBreakdown();
     const player = TestPlayers.BLUE.newPlayer();
     const player2 = TestPlayers.RED.newPlayer();
-    const game = new Game('foobar', [player, player2], player);
+    const game = Game.newInstance('foobar', [player, player2], player);
     const turmoil = Turmoil.newInstance(game);
 
     turmoil.initGlobalEvent(game);
@@ -37,14 +37,14 @@ describe('ParadigmBreakdown', function() {
 
     card.resolve(game, turmoil);
     while (game.deferredActions.length) {
-      const action = game.deferredActions.next()!;
+      const action = game.deferredActions.peek()!;
       const input = action.execute();
       if (input !== undefined && input instanceof SelectCard) {
         // Only |player| should be asked which cards to discard
         expect(action.player.id).to.eq(player.id);
         input.cb([powerPlant, asteroid]);
       }
-      game.deferredActions.shift();
+      game.deferredActions.pop();
     }
 
     expect(player.cardsInHand).has.lengthOf(1);

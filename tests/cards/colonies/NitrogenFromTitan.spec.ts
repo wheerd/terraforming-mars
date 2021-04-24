@@ -6,7 +6,7 @@ import {ICard} from '../../../src/cards/ICard';
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('NitrogenFromTitan', function() {
   let card : NitrogenFromTitan; let player : Player; let game : Game;
@@ -14,14 +14,15 @@ describe('NitrogenFromTitan', function() {
   beforeEach(function() {
     card = new NitrogenFromTitan();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can play without floaters', function() {
     const tr = player.getTerraformRating();
-    card.play(player, game);
+    card.play(player);
     expect(player.getTerraformRating()).to.eq(tr + 2);
-    const input = game.deferredActions.next()!.execute();
+    const input = game.deferredActions.peek()!.execute();
     expect(input).is.undefined;
   });
 
@@ -29,8 +30,8 @@ describe('NitrogenFromTitan', function() {
     const jovianLanterns = new JovianLanterns();
     player.playedCards.push(jovianLanterns);
 
-    card.play(player, game);
-    game.deferredActions.runNext();
+    card.play(player);
+    player.game.deferredActions.runNext();
     expect(jovianLanterns.resourceCount).to.eq(2);
   });
 
@@ -38,10 +39,10 @@ describe('NitrogenFromTitan', function() {
     const jovianLanterns = new JovianLanterns();
     player.playedCards.push(jovianLanterns, new TitanFloatingLaunchPad());
 
-    card.play(player, game);
+    card.play(player);
     expect(game.deferredActions).has.lengthOf(1);
 
-    const selectCard = game.deferredActions.next()!.execute() as SelectCard<ICard>;
+    const selectCard = game.deferredActions.peek()!.execute() as SelectCard<ICard>;
     selectCard.cb([jovianLanterns]);
     expect(jovianLanterns.resourceCount).to.eq(2);
   });

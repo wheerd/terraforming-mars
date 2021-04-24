@@ -3,16 +3,16 @@ import {Sabotage} from '../../../src/cards/base/Sabotage';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Sabotage', function() {
-  let card : Sabotage; let player : Player; let player2: Player; let game: Game;
+  let card : Sabotage; let player : Player; let player2: Player;
 
   beforeEach(function() {
     card = new Sabotage();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    Game.newInstance('foobar', [player, player2], player);
   });
 
   it('Should play', function() {
@@ -20,7 +20,9 @@ describe('Sabotage', function() {
     player2.steel = 4;
     player2.megaCredits = 7;
 
-    const action = card.play(player, game) as OrOptions;
+    const action = card.play(player) as OrOptions;
+
+    expect(action.options).has.lengthOf(4);
 
     action.options[0].cb();
     expect(player2.titanium).to.eq(0);

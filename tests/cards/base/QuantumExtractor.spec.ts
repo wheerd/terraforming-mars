@@ -4,15 +4,16 @@ import {QuantumExtractor} from '../../../src/cards/base/QuantumExtractor';
 import {TollStation} from '../../../src/cards/base/TollStation';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('QuantumExtractor', function() {
-  let card : QuantumExtractor; let player : Player; let game : Game;
+  let card : QuantumExtractor; let player : Player;
 
   beforeEach(function() {
     card = new QuantumExtractor();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -22,7 +23,7 @@ describe('QuantumExtractor', function() {
   it('Should play', function() {
     player.playedCards.push(card, card, card, card);
     card.play(player);
-    expect(card.getCardDiscount(player, game, new TollStation())).to.eq(2);
-    expect(card.getCardDiscount(player, game, new Bushes())).to.eq(0);
+    expect(card.getCardDiscount(player, new TollStation())).to.eq(2);
+    expect(card.getCardDiscount(player, new Bushes())).to.eq(0);
   });
 });

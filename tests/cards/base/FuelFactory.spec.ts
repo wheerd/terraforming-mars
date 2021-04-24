@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {FuelFactory} from '../../../src/cards/base/FuelFactory';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('FuelFactory', function() {
   let card : FuelFactory; let player : Player;
@@ -17,7 +17,7 @@ describe('FuelFactory', function() {
   });
 
   it('Should play', function() {
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     expect(card.canPlay(player)).is.true;
     card.play(player);
 

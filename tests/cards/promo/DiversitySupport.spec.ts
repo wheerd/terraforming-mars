@@ -5,15 +5,16 @@ import {DiversitySupport} from '../../../src/cards/promo/DiversitySupport';
 import {Dirigibles} from '../../../src/cards/venusNext/Dirigibles';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('DiversitySupport', function() {
-  let card : DiversitySupport; let player : Player; let game : Game;
+  let card : DiversitySupport; let player : Player;
 
   beforeEach(function() {
     card = new DiversitySupport();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -40,7 +41,7 @@ describe('DiversitySupport', function() {
     player.heat = 3;
 
     expect(card.canPlay(player)).is.true;
-    card.play(player, game);
+    card.play(player);
     expect(player.getTerraformRating()).to.eq(21);
   });
 });

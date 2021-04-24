@@ -3,7 +3,7 @@ import {ResearchOutpost} from '../../../src/cards/base/ResearchOutpost';
 import {Game} from '../../../src/Game';
 import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('ResearchOutpost', function() {
   let card : ResearchOutpost; let player : Player; let game : Game;
@@ -11,11 +11,12 @@ describe('ResearchOutpost', function() {
   beforeEach(function() {
     card = new ResearchOutpost();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
-    const action = card.play(player, game) as SelectSpace;
+    const action = card.play(player) as SelectSpace;
     expect(action).is.not.undefined;
 
     action.cb(action.availableSpaces[0]);
@@ -29,6 +30,6 @@ describe('ResearchOutpost', function() {
       game.addGreenery(player, lands[i].id);
     }
 
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 });

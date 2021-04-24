@@ -3,7 +3,7 @@ import {InventorsGuild} from '../../../src/cards/base/InventorsGuild';
 import {Plantation} from '../../../src/cards/base/Plantation';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Plantation', function() {
   let card : Plantation; let player : Player; let game : Game;
@@ -11,18 +11,19 @@ describe('Plantation', function() {
   beforeEach(function() {
     card = new Plantation();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     player.playedCards.push(new InventorsGuild(), new InventorsGuild());
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
     action.cb(action.availableSpaces[0]);
     expect(game.getOxygenLevel()).to.eq(1);

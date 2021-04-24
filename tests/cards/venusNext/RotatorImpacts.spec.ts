@@ -5,79 +5,85 @@ import {MAX_VENUS_SCALE} from '../../../src/constants';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
-describe('RotatorImpacts', function() {
+describe('RotatorImpacts', () => {
   let card : RotatorImpacts; let player : Player; let game : Game;
 
-  beforeEach(function() {
+  beforeEach(() => {
     card = new RotatorImpacts();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
-  it('Can\'t play', function() {
+  it('Cannot play', () => {
     (game as any).venusScaleLevel = 16;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Should play', function() {
-    expect(card.canPlay(player, game)).is.true;
+  it('Can play', () => {
+    (game as any).venusScaleLevel = 14;
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('Should play', () => {
+    expect(card.canPlay(player)).is.true;
     const action = card.play();
     expect(action).is.undefined;
   });
 
-  it('Works with MSI corporation', function() {
+  it('Works with MSI corporation', () => {
     const corp = new MorningStarInc();
     corp.play();
     player.corporationCard = corp;
 
     (game as any).venusScaleLevel = 18;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
   });
 
-  it('Should act', function() {
+  it('Should act', () => {
     player.playedCards.push(card);
     player.megaCredits = 16;
     player.titanium = 2;
 
     // only one possible action: add resource to card
     expect(card.resourceCount).to.eq(0);
-    expect(card.canAct(player, game)).is.true;
+    expect(card.canAct(player)).is.true;
 
-    card.action(player, game);
+    card.action(player);
     expect(card.resourceCount).to.eq(1);
 
     // two possible actions: add resource or spend titanium
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions instanceof OrOptions).is.true;
     orOptions.options[0].cb();
     expect(card.resourceCount).to.eq(0);
     expect(game.getVenusScaleLevel()).to.eq(2);
   });
 
-  it('Should not allow to raise Venus level if there no resources on card', function() {
+  it('Should not allow to raise Venus level if there no resources on card', () => {
     player.playedCards.push(card);
     player.megaCredits = 5;
-    expect(card.canAct(player, game)).is.not.true;
+    expect(card.canAct(player)).is.not.true;
   });
 
-  it('Should allow to raise Venus level only', function() {
+  it('Should allow to raise Venus level only', () => {
     player.playedCards.push(card);
     card.resourceCount = 1;
-    expect(card.canAct(player, game)).is.true;
+    expect(card.canAct(player)).is.true;
 
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action).is.undefined;
     expect(card.resourceCount).to.eq(0);
     expect(game.getVenusScaleLevel()).to.eq(2);
   });
 
-  it('Should not allow to raise Venus level if Venus level is maxed out', function() {
+  it('Should not allow to raise Venus level if Venus level is maxed out', () => {
     player.playedCards.push(card);
     card.resourceCount = 1;
 
     (game as any).venusScaleLevel = MAX_VENUS_SCALE;
-    expect(card.canAct(player, game)).is.not.true;
+    expect(card.canAct(player)).is.not.true;
   });
 });

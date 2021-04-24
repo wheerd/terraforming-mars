@@ -1,26 +1,43 @@
-
 import {IProjectCard} from '../IProjectCard';
 import {Tags} from '../Tags';
+import {Card} from '../Card';
 import {CardType} from '../CardType';
 import {Player} from '../../Player';
-import {Game} from '../../Game';
 import {Resources} from '../../Resources';
 import {CardName} from '../../CardName';
+import {CardRequirements} from '../CardRequirements';
+import {CardRenderer} from '../render/CardRenderer';
+import {Units} from '../../Units';
 
-export class NoctisFarming implements IProjectCard {
-    public cost = 10;
-    public tags = [Tags.PLANT, Tags.STEEL];
-    public name = CardName.NOCTIS_FARMING;
-    public cardType = CardType.AUTOMATED;
-    public canPlay(player: Player, game: Game): boolean {
-      return game.getTemperature() >= -20 - (2 * player.getRequirementsBonus(game));
-    }
-    public play(player: Player) {
-      player.addProduction(Resources.MEGACREDITS);
-      player.plants += 2;
-      return undefined;
-    }
-    public getVictoryPoints() {
-      return 1;
-    }
+export class NoctisFarming extends Card implements IProjectCard {
+  constructor() {
+    super({
+      cardType: CardType.AUTOMATED,
+      name: CardName.NOCTIS_FARMING,
+      tags: [Tags.PLANT, Tags.BUILDING],
+      cost: 10,
+      productionBox: Units.of({megacredits: 1}),
+
+      requirements: CardRequirements.builder((b) => b.temperature(-20)),
+      metadata: {
+        cardNumber: '176',
+        renderData: CardRenderer.builder((b) => {
+          b.production((pb) => {
+            pb.megacredits(1);
+          }).nbsp.plants(2);
+        }),
+        description: 'Requires -20 C or warmer. Increase your M€ production 1 step and gain 2 Plants.',
+        victoryPoints: 1,
+      },
+    });
+  }
+
+  public play(player: Player) {
+    player.addProduction(Resources.MEGACREDITS, 1);
+    player.plants += 2;
+    return undefined;
+  }
+  public getVictoryPoints() {
+    return 1;
+  }
 }

@@ -3,7 +3,7 @@ import {SearchForLife} from '../../../src/cards/base/SearchForLife';
 import {Tags} from '../../../src/cards/Tags';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('SearchForLife', function() {
   let card : SearchForLife; let player : Player; let game : Game;
@@ -11,7 +11,8 @@ describe('SearchForLife', function() {
   beforeEach(function() {
     card = new SearchForLife();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t act if no MC', function() {
@@ -20,12 +21,12 @@ describe('SearchForLife', function() {
 
   it('Can\'t play if oxygen level too high', function() {
     (game as any).oxygenLevel = 7;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).oxygenLevel = 6;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
     player.playedCards.push(card);
     card.play();
 
@@ -38,10 +39,10 @@ describe('SearchForLife', function() {
   it('Should act', function() {
     player.playedCards.push(card);
 
-    while (game.dealer.discarded.find((c) => c.tags.length === 1 && c.tags[0] === Tags.MICROBES) === undefined ||
-               game.dealer.discarded.find((c) => c.tags.length === 1 && c.tags[0] !== Tags.MICROBES) === undefined) {
+    while (game.dealer.discarded.find((c) => c.tags.length === 1 && c.tags[0] === Tags.MICROBE) === undefined ||
+               game.dealer.discarded.find((c) => c.tags.length === 1 && c.tags[0] !== Tags.MICROBE) === undefined) {
       player.megaCredits = 1;
-      card.action(player, game);
+      card.action(player);
       game.deferredActions.runNext();
       expect(player.megaCredits).to.eq(0);
     }

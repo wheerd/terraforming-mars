@@ -55,6 +55,7 @@ import {TradeEnvoys} from './TradeEnvoys';
 import {TradingColony} from './TradingColony';
 import {UrbanDecomposers} from './UrbanDecomposers';
 import {WarpDrive} from './WarpDrive';
+import {BuildColonyStandardProject} from './BuildColonyStandardProject';
 
 export const COLONIES_CARD_MANIFEST = new CardManifest({
   module: GameModule.Colonies,
@@ -103,14 +104,16 @@ export const COLONIES_CARD_MANIFEST = new CardManifest({
     {cardName: CardName.SPINOFF_DEPARTMENT, Factory: SpinoffDepartment},
     {cardName: CardName.SUBZERO_SALT_FISH, Factory: SubZeroSaltFish},
     {cardName: CardName.TITAN_AIRSCRAPPING, Factory: TitanAirScrapping},
-    {cardName: CardName.TITAN_FLOATER_LAUNCHPAD, Factory: TitanFloatingLaunchPad},
+    {cardName: CardName.TITAN_FLOATING_LAUNCHPAD, Factory: TitanFloatingLaunchPad},
     {cardName: CardName.TITAN_SHUTTLES, Factory: TitanShuttles},
     {cardName: CardName.TRADING_COLONY, Factory: TradingColony},
     {cardName: CardName.TRADE_ENVOYS, Factory: TradeEnvoys},
     {cardName: CardName.URBAN_DECOMPOSERS, Factory: UrbanDecomposers},
     {cardName: CardName.WARP_DRIVE, Factory: WarpDrive},
   ],
-
+  standardProjects: [
+    {cardName: CardName.BUILD_COLONY_STANDARD_PROJECT, Factory: BuildColonyStandardProject},
+  ],
   corporationCards: [
     {cardName: CardName.ARIDOR, Factory: Aridor},
     {cardName: CardName.ARKLIGHT, Factory: Arklight},

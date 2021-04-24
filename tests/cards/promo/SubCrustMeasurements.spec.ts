@@ -3,15 +3,16 @@ import {Research} from '../../../src/cards/base/Research';
 import {SubCrustMeasurements} from '../../../src/cards/promo/SubCrustMeasurements';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('SubCrustMeasurements', function() {
-  let card : SubCrustMeasurements; let player : Player; let game : Game;
+  let card : SubCrustMeasurements; let player : Player;
 
   beforeEach(function() {
     card = new SubCrustMeasurements();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play if not enough science tags', function() {
@@ -28,7 +29,7 @@ describe('SubCrustMeasurements', function() {
 
   it('Should take action', function() {
     expect(player.cardsInHand).has.lengthOf(0);
-    card.action(player, game);
+    card.action(player);
     expect(player.cardsInHand).has.lengthOf(1);
   });
 });

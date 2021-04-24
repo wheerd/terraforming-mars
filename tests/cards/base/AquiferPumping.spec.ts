@@ -2,7 +2,8 @@ import {expect} from 'chai';
 import {AquiferPumping} from '../../../src/cards/base/AquiferPumping';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {maxOutOceans, TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('AquiferPumping', function() {
   let card : AquiferPumping; let player : Player; let game : Game;
@@ -10,7 +11,8 @@ describe('AquiferPumping', function() {
   beforeEach(function() {
     card = new AquiferPumping();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
@@ -19,20 +21,20 @@ describe('AquiferPumping', function() {
 
   it('Should act', function() {
     player.megaCredits = 8;
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action).is.undefined;
     game.deferredActions.runNext();
     expect(player.megaCredits).to.eq(0);
   });
 
   it('Cannot act if not enough to pay', function() {
-    expect(card.canAct(player, game)).is.not.true;
+    expect(card.canAct(player)).is.not.true;
   });
 
   it('Can act if can pay even after oceans are maxed', function() {
-    maxOutOceans(player, game);
+    TestingUtils.maxOutOceans(player);
     player.megaCredits = 8;
 
-    expect(card.canAct(player, game)).is.true;
+    expect(card.canAct(player)).is.true;
   });
 });

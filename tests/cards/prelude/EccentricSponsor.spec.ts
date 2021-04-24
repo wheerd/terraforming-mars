@@ -2,25 +2,25 @@ import {expect} from 'chai';
 import {EccentricSponsor} from '../../../src/cards/prelude/EccentricSponsor';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('EccentricSponsor', function() {
-  let card : EccentricSponsor; let player : Player; let game : Game;
+  let card : EccentricSponsor; let player : Player;
 
   beforeEach(function() {
     card = new EccentricSponsor();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player], player);
+    Game.newInstance('foobar', [player], player);
   });
 
   it('Gets card discount', function() {
-    expect(card.getCardDiscount(player, game)).to.eq(0);
+    expect(card.getCardDiscount(player)).to.eq(0);
     player.lastCardPlayed = card;
-    expect(card.getCardDiscount(player, game)).to.eq(25);
+    expect(card.getCardDiscount(player)).to.eq(25);
   });
 
   it('Should play', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.undefined;
   });
 });

@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {LunarBeam} from '../../../src/cards/base/LunarBeam';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('LunarBeam', function() {
   let card : LunarBeam; let player : Player;
@@ -16,7 +16,7 @@ describe('LunarBeam', function() {
     player.addProduction(Resources.MEGACREDITS, -4);
     expect(card.canPlay(player)).is.not.true;
 
-    player.addProduction(Resources.MEGACREDITS);
+    player.addProduction(Resources.MEGACREDITS, 1);
     expect(card.canPlay(player)).is.true;
   });
 

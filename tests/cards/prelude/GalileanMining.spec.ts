@@ -3,7 +3,7 @@ import {GalileanMining} from '../../../src/cards/prelude/GalileanMining';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('GalileanMining', function() {
   let card : GalileanMining; let player : Player; let game : Game;
@@ -11,19 +11,19 @@ describe('GalileanMining', function() {
   beforeEach(function() {
     card = new GalileanMining();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player], player);
+    game = Game.newInstance('foobar', [player], player);
   });
 
   it('Can\'t play', function() {
     player.megaCredits = 4;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     player.megaCredits = 5;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    card.play(player, game);
+    card.play(player);
 
     // SelectHowToPayDeferred
     game.deferredActions.runNext();

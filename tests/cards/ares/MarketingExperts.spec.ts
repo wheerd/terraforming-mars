@@ -8,7 +8,7 @@ import {TileType} from '../../../src/TileType';
 import {ARES_OPTIONS_NO_HAZARDS} from '../../ares/AresTestHelper';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {EmptyBoard} from '../../ares/EmptyBoard';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('MarketingExperts', function() {
   let card : MarketingExperts; let player : Player; let otherPlayer: Player; let game : Game;
@@ -17,13 +17,13 @@ describe('MarketingExperts', function() {
     card = new MarketingExperts();
     player = TestPlayers.BLUE.newPlayer();
     otherPlayer = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, otherPlayer], player, ARES_OPTIONS_NO_HAZARDS);
-    game.board = new EmptyBoard();
+    game = Game.newInstance('foobar', [player, otherPlayer], player, ARES_OPTIONS_NO_HAZARDS);
+    game.board = EmptyBoard.newInstance();
   });
 
   it('Play', function() {
     expect(player.getProduction(Resources.MEGACREDITS)).eq(0);
-    card.play(player, game);
+    card.play(player);
     expect(player.getProduction(Resources.MEGACREDITS)).eq(1);
   });
 

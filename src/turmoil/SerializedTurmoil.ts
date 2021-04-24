@@ -1,31 +1,27 @@
-import {IParty} from './parties/IParty';
-import {GlobalEventDealer} from './globalEvents/GlobalEventDealer';
-import {IGlobalEvent} from './globalEvents/IGlobalEvent';
-import {PlayerId} from '../Player';
 import {GlobalEventName} from './globalEvents/GlobalEventName';
 import {PartyName} from './parties/PartyName';
 import {SerializedGlobalEventDealer} from './globalEvents/SerializedGlobalEventDealer';
+import {SerializedPoliticalAgendasData} from './PoliticalAgendas';
+import {NeutralPlayer} from './Turmoil';
+import {PlayerId} from '../Player';
 
 export interface SerializedParty {
     name: PartyName;
-    delegates: Array<PlayerId | 'NEUTRAL'>;
-    partyLeader: undefined | PlayerId | 'NEUTRAL';
+    delegates: Array<PlayerId | NeutralPlayer>;
+    partyLeader: undefined | PlayerId | NeutralPlayer;
 }
 
-// TODO(kberg): By 2021-01-15, remove delegeate_reserve, commingGlobalEvent, and uses
-// of IParty, GlobalEventDealer, and IGlobalEvent.
 export interface SerializedTurmoil {
-    chairman: undefined | PlayerId | 'NEUTRAL';
-    rulingParty: IParty | PartyName;
-    dominantParty: IParty | PartyName;
+    chairman: undefined | PlayerId | NeutralPlayer;
+    rulingParty: PartyName;
+    dominantParty: PartyName;
     lobby: Array<string>;
-    delegate_reserve: Array<PlayerId | 'NEUTRAL'>; // eslint-disable-line camelcase
-    delegateReserve: Array<PlayerId | 'NEUTRAL'> | undefined;
-    parties: Array<IParty | SerializedParty>;
+    delegateReserve: Array<PlayerId | NeutralPlayer>;
+    parties: Array<SerializedParty>;
     playersInfluenceBonus: Array<[string, number]>;
-    globalEventDealer: GlobalEventDealer | SerializedGlobalEventDealer;
-    distantGlobalEvent: IGlobalEvent | GlobalEventName | undefined;
-    commingGlobalEvent: IGlobalEvent | undefined;
+    globalEventDealer: SerializedGlobalEventDealer;
+    distantGlobalEvent: GlobalEventName | undefined;
     comingGlobalEvent: GlobalEventName | undefined;
-    currentGlobalEvent?: IGlobalEvent | GlobalEventName;
+    currentGlobalEvent?: GlobalEventName;
+    politicalAgendasData: SerializedPoliticalAgendasData;
 }

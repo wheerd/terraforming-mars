@@ -6,7 +6,7 @@ import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('TitanShuttles', function() {
   let card : TitanShuttles; let player : Player; let game : Game;
@@ -14,7 +14,8 @@ describe('TitanShuttles', function() {
   beforeEach(function() {
     card = new TitanShuttles();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
 
     player.playedCards.push(card);
   });
@@ -33,9 +34,9 @@ describe('TitanShuttles', function() {
   });
 
   it('Auto add floaters if only 1 option and 1 target available', function() {
-    card.action(player, game);
+    card.action(player);
     expect(game.deferredActions).has.lengthOf(1);
-    const input = game.deferredActions.next()!.execute();
+    const input = game.deferredActions.peek()!.execute();
     expect(input).is.undefined;
     expect(card.resourceCount).to.eq(2);
   });
@@ -44,10 +45,10 @@ describe('TitanShuttles', function() {
     const card2 = new TitanFloatingLaunchPad();
     player.playedCards.push(card2);
 
-    card.action(player, game);
+    card.action(player);
     expect(game.deferredActions).has.lengthOf(1);
 
-    const selectCard = game.deferredActions.next()!.execute() as SelectCard<ICard>;
+    const selectCard = game.deferredActions.peek()!.execute() as SelectCard<ICard>;
     selectCard.cb([card]);
     expect(card.resourceCount).to.eq(2);
   });
@@ -57,7 +58,7 @@ describe('TitanShuttles', function() {
     player.playedCards.push(card2);
     player.addResourceTo(card, 7);
 
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions instanceof OrOptions).is.true;
     expect(orOptions.options).has.lengthOf(2);
 
@@ -70,7 +71,7 @@ describe('TitanShuttles', function() {
     orOptions.options[0].cb();
     expect(game.deferredActions).has.lengthOf(1);
 
-    const selectCard = game.deferredActions.next()!.execute() as SelectCard<ICard>;
+    const selectCard = game.deferredActions.peek()!.execute() as SelectCard<ICard>;
     selectCard.cb([card2]);
     expect(card2.resourceCount).to.eq(2);
   });

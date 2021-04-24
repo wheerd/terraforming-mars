@@ -1,150 +1,247 @@
-
-import {Color} from '../Color';
 import {Database} from './Database';
-import {Game} from '../Game';
-import {Player} from '../Player';
+import {Game, GameId, SpectatorId} from '../Game';
+import {PlayerId} from '../Player';
+import {IGameLoader} from './IGameLoader';
+import {MultiMap} from 'mnemonist';
 
 type LoadCallback = (game: Game | undefined) => void;
-enum State { WAITING, LOADING, READY }
 
-export class GameLoader {
-    private state: State = State.WAITING;
-    private readonly games = new Map<string, Game>();
-    private readonly pendingGame = new Map<string, Array<LoadCallback>>();
-    private readonly pendingPlayer = new Map<string, Array<LoadCallback>>();
-    private readonly playerToGame = new Map<string, Game>();
+enum State {
+  /**
+   * No id has been requested
+   */
+  WAITING,
+  /**
+   * Running query and populating ids
+   */
+  LOADING,
+  /**
+   * ids populated from database
+   */
+  READY
+}
 
-    public start(cb = () => {}): void {
-      switch (this.state) {
-      case State.READY:
-        console.warn('already loaded, ignoring');
-        return;
-      case State.LOADING:
-        console.warn('already loading, ignoring');
-        return;
-      case State.WAITING:
-        this.loadAllGames(cb);
-      }
+type GameIdCallback = () => void;
+
+/**
+ * Loads games from javascript memory or database
+ * Loads games from database sequentially as needed
+ */
+export class GameLoader implements IGameLoader {
+  private state = State.WAITING;
+
+  // indicates if game is being loaded from database
+  private loadingGame = false;
+
+  // games available in javascript memory, undefined represents game
+  // in database not yet loaded
+  private readonly games = new Map<GameId, Game | undefined>();
+
+  // player ids which we know exist mapped to game id
+  private readonly onGameIdsLoaded: Array<GameIdCallback> = [];
+
+  // participant ids which we know exist mapped to game id
+  private readonly participantIds = new Map<SpectatorId | PlayerId, GameId>();
+
+  private static readonly instance = new GameLoader();
+
+  private constructor() {}
+
+  public reset(): void {
+    this.games.clear();
+    this.participantIds.clear();
+    this.state = State.WAITING;
+    this.loadingGame = false;
+    if (this.onGameIdsLoaded.length > 0) {
+      throw new Error('can not reset with pending callbacks');
     }
+  }
 
-    public addGame(game: Game): void {
-      this.games.set(game.id, game);
-      for (const player of game.getPlayers()) {
-        this.playerToGame.set(player.id, game);
-      }
+  public static getInstance(): IGameLoader {
+    return GameLoader.instance;
+  }
+
+  public add(game: Game): void {
+    this.games.set(game.id, game);
+    if (game.spectatorId !== undefined) {
+      this.participantIds.set(game.spectatorId, game.id);
     }
-
-    public getLoadedGameIds(): Array<string> {
-      return Array.from(this.games.keys());
+    for (const player of game.getPlayers()) {
+      this.participantIds.set(player.id, game.id);
     }
+  }
 
-    public getGameByGameId(gameId: string, cb: LoadCallback): void {
-      if (this.state === State.READY || this.games.has(gameId)) {
-        cb(this.games.get(gameId));
-        return;
-      }
-      const pendingGame = this.pendingGame.get(gameId);
-      if (pendingGame !== undefined) {
-        pendingGame.push(cb);
-      } else {
-        this.pendingGame.set(gameId, [cb]);
-      }
+  public getLoadedGameIds(): Array<{id: GameId, participants: Array<SpectatorId | PlayerId>}> {
+    const map = new MultiMap<GameId, SpectatorId | PlayerId>();
+
+    this.participantIds.forEach((gameId, participantId) => map.set(gameId, participantId));
+    const arry: Array<[string, Array<string>]> = Array.from(map.associations());
+    return arry.map(([id, participants]) => ({id: id, participants: participants}));
+  }
+
+  public getByGameId(gameId: GameId, bypassCache: boolean, cb: LoadCallback): void {
+    this.loadAllGameIds();
+    if (bypassCache === false && this.games.get(gameId) !== undefined) {
+      cb(this.games.get(gameId));
+    } else if (this.games.has(gameId) || this.state !== State.READY) {
+      this.onGameIdsLoaded.unshift(() => {
+        this.loadGame(gameId, bypassCache, this.onGameLoaded(cb));
+      });
+      this.runGameIdLoadedCallback();
+    } else {
+      cb(undefined);
     }
+  }
 
-    public getGameByPlayerId(playerId: string, cb: LoadCallback): void {
-      if (this.state === State.READY || this.playerToGame.has(playerId)) {
-        cb(this.playerToGame.get(playerId));
-        return;
-      }
-      const pendingPlayer = this.pendingPlayer.get(playerId);
-      if (pendingPlayer !== undefined) {
-        pendingPlayer.push(cb);
-      } else {
-        this.pendingPlayer.set(playerId, [cb]);
-      }
+  private getByParticipantId(id: PlayerId | SpectatorId, cb: LoadCallback): void {
+    this.loadAllGameIds();
+    const gameId = this.participantIds.get(id);
+    if (gameId !== undefined && this.games.get(gameId) !== undefined) {
+      cb(this.games.get(gameId));
+    } else if (gameId !== undefined || this.state !== State.READY) {
+      this.onGameIdsLoaded.push(() => {
+        this.loadParticipant(id, this.onGameLoaded(cb));
+      });
+      this.runGameIdLoadedCallback();
+    } else {
+      cb(undefined);
     }
+  }
 
-    private onGameLoaded(gameId: string, playerId: string): void {
-      const pendingGames = this.pendingGame.get(gameId);
-      if (pendingGames !== undefined) {
-        for (const pendingGame of pendingGames) {
-          pendingGame(this.games.get(gameId));
-        }
-        this.pendingGame.delete(gameId);
-      }
-      const pendingPlayers = this.pendingPlayer.get(playerId);
-      if (pendingPlayers !== undefined) {
-        for (const pendingPlayer of pendingPlayers) {
-          pendingPlayer(this.playerToGame.get(playerId));
-        }
-        this.pendingPlayer.delete(playerId);
-      }
-    }
+  public getByPlayerId(playerId: PlayerId, cb: LoadCallback): void {
+    this.getByParticipantId(playerId, cb);
+  }
 
-    private onAllGamesLoaded(): void {
-      this.state = State.READY;
+  public getBySpectatorId(spectatorId: SpectatorId, cb: LoadCallback): void {
+    this.getByParticipantId(spectatorId, cb);
+  }
 
-      // any pendingPlayer or pendingGame callbacks
-      // are waiting for a train that is never coming
-      // send them packing. call their callbacks with
-      // undefined and remove from pending
-      for (const pendingGame of Array.from(this.pendingGame.values())) {
-        for (const cb of pendingGame) {
+  public restoreGameAt(gameId: GameId, saveId: number, cb: LoadCallback): void {
+    try {
+      Database.getInstance().restoreGame(gameId, saveId, (err, game) => {
+        if (game !== undefined) {
+          Database.getInstance().deleteGameNbrSaves(gameId, 1);
+          this.add(game);
+          game.undoCount++;
+          cb(game);
+        } else {
+          console.log(err);
           cb(undefined);
         }
-      }
-      this.pendingGame.clear();
-      for (const pendingPlayer of Array.from(this.pendingPlayer.values())) {
-        for (const cb of pendingPlayer) {
-          cb(undefined);
-        }
-      }
-      this.pendingPlayer.clear();
+      });
+    } catch (error) {
+      console.log(error);
+      cb(undefined);
     }
+  }
 
-    private loadAllGames(cb = () => {}): void {
-      this.state = State.LOADING;
-
-      Database.getInstance().getGames((err, allGames) => {
-        if (err) {
-          console.error('error loading all games', err);
-          this.onAllGamesLoaded();
-          cb();
+  private loadGame(gameId: GameId, bypassCache: boolean, cb: LoadCallback): void {
+    this.loadingGame = true;
+    if (bypassCache === false && this.games.get(gameId) !== undefined) {
+      cb(this.games.get(gameId));
+    } else if (this.games.has(gameId) === false) {
+      console.warn(`GameLoader:game id not found ${gameId}`);
+      cb(undefined);
+    } else {
+      Database.getInstance().getGame(gameId, (err: any, serializedGame?) => {
+        if (err || (serializedGame === undefined)) {
+          console.error('GameLoader:loadGame', err);
+          cb(undefined);
           return;
         }
-
-        if (allGames.length === 0) {
-          this.onAllGamesLoaded();
-          cb();
-        };
-
-        let loaded = 0;
-        allGames.forEach((game_id) => {
-          const player = new Player('test', Color.BLUE, false, 0);
-          const player2 = new Player('test2', Color.RED, false, 0);
-          const gameToRebuild = new Game(game_id, [player, player2], player);
-          Database.getInstance().restoreGameLastSave(
-            game_id,
-            gameToRebuild,
-            (err) => {
-              loaded++;
-              if (err) {
-                console.error(`unable to load game ${game_id}`, err);
-              } else {
-                console.log(`load game ${game_id}`);
-                this.games.set(gameToRebuild.id, gameToRebuild);
-                for (const player of gameToRebuild.getPlayers()) {
-                  this.playerToGame.set(player.id, gameToRebuild);
-                  this.onGameLoaded(gameToRebuild.id, player.id);
-                }
-              }
-              if (loaded === allGames.length) {
-                this.onAllGamesLoaded();
-                cb();
-              }
-            },
-          );
-        });
+        try {
+          const game = Game.deserialize(serializedGame);
+          this.add(game);
+          console.log(`GameLoader loaded game ${gameId} into memory from database`);
+          cb(game);
+        } catch (e) {
+          console.error('GameLoader:loadGame', e);
+          cb(undefined);
+          return;
+        }
       });
     }
+  }
+
+  private loadParticipant(id: PlayerId | SpectatorId, cb: LoadCallback): void {
+    const gameId = this.participantIds.get(id);
+    this.loadingGame = true;
+    if (gameId === undefined) {
+      console.warn(`GameLoader:id not found ${id}`);
+      cb(undefined);
+      return;
+    }
+    if (this.games.get(gameId) !== undefined) {
+      cb(this.games.get(gameId));
+      return;
+    }
+    this.loadGame(gameId, false, cb);
+  }
+
+  private onGameLoaded(cb: LoadCallback) {
+    return (game: Game | undefined) => {
+      cb(game);
+      this.loadingGame = false;
+      this.runGameIdLoadedCallback();
+    };
+  }
+
+  private runGameIdLoadedCallback(): void {
+    if (this.state === State.READY && this.loadingGame === false) {
+      const callback = this.onGameIdsLoaded.shift();
+      if (callback !== undefined) {
+        callback();
+      }
+    }
+  }
+
+  private allGameIdsLoaded(): void {
+    this.state = State.READY;
+    this.runGameIdLoadedCallback();
+  }
+
+  private loadAllGameIds(): void {
+    if (this.state !== State.WAITING) {
+      return;
+    }
+    this.state = State.LOADING;
+    Database.getInstance().getGames((err, allGameIds) => {
+      if (err) {
+        console.error('error loading all games', err);
+        this.allGameIdsLoaded();
+        return;
+      }
+
+      if (allGameIds.length === 0) {
+        this.allGameIdsLoaded();
+        return;
+      }
+
+      let loaded = 0;
+      allGameIds.forEach((gameId) => {
+        Database.getInstance().getGame(
+          gameId,
+          (err, game) => {
+            loaded++;
+            if (err || (game === undefined)) {
+              console.error(`unable to load game ${gameId}`, err);
+            } else {
+              console.log(`load game ${gameId} with ${game.spectatorId}`);
+              if (this.games.get(gameId) === undefined) {
+                this.games.set(gameId, undefined);
+                if (game.spectatorId !== undefined) {
+                  this.participantIds.set(game.spectatorId, gameId);
+                }
+                for (const player of game.players) {
+                  this.participantIds.set(player.id, gameId);
+                }
+              }
+            }
+            if (loaded === allGameIds.length) {
+              this.allGameIdsLoaded();
+            }
+          });
+      });
+    });
+  }
 }

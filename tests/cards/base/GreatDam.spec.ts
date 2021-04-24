@@ -3,24 +3,29 @@ import {GreatDam} from '../../../src/cards/base/GreatDam';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {maxOutOceans, TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
-describe('GreatDam', function() {
-  let card : GreatDam; let player : Player; let game : Game;
+describe('GreatDam', () => {
+  let card : GreatDam; let player : Player;
 
-  beforeEach(function() {
+  beforeEach(() => {
     card = new GreatDam();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
-  it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+  it('Can play', () => {
+    TestingUtils.maxOutOceans(player, 3);
+    expect(card.canPlay(player)).is.not.true;
+    TestingUtils.maxOutOceans(player, 4);
+    expect(card.canPlay(player)).is.true;
   });
 
-  it('Should play', function() {
-    maxOutOceans(player, game, 4);
-    expect(card.canPlay(player, game)).is.true;
+  it('Should play', () => {
+    TestingUtils.maxOutOceans(player, 4);
+    expect(card.canPlay(player)).is.true;
     card.play(player);
 
     expect(player.getProduction(Resources.ENERGY)).to.eq(2);

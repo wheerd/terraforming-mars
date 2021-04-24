@@ -3,7 +3,7 @@ import {UndergroundDetonations} from '../../../src/cards/base/UndergroundDetonat
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('UndergroundDetonations', function() {
   let card : UndergroundDetonations; let player : Player; let game : Game;
@@ -11,7 +11,8 @@ describe('UndergroundDetonations', function() {
   beforeEach(function() {
     card = new UndergroundDetonations();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t act', function() {
@@ -23,7 +24,7 @@ describe('UndergroundDetonations', function() {
     player.megaCredits = 10;
     expect(card.canAct(player)).is.true;
 
-    card.action(player, game);
+    card.action(player);
     game.deferredActions.runNext();
     expect(player.megaCredits).to.eq(0);
     expect(player.getProduction(Resources.HEAT)).to.eq(2);

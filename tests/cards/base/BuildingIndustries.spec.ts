@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import {BuildingIndustries} from '../../../src/cards/base/BuildingIndustries';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('BuildingIndustries', function() {
   let card : BuildingIndustries; let player : Player;
@@ -17,7 +17,7 @@ describe('BuildingIndustries', function() {
   });
 
   it('Should play', function() {
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     expect(card.canPlay(player)).is.true;
 
     card.play(player);

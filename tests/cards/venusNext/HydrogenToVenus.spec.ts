@@ -7,7 +7,7 @@ import {HydrogenToVenus} from '../../../src/cards/venusNext/HydrogenToVenus';
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('HydrogenToVenus', function() {
   let card : HydrogenToVenus; let player : Player; let game : Game;
@@ -15,7 +15,8 @@ describe('HydrogenToVenus', function() {
   beforeEach(function() {
     card = new HydrogenToVenus();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play with multiple venus cards', function() {
@@ -24,7 +25,7 @@ describe('HydrogenToVenus', function() {
     const card4 = new Dirigibles();
     player.playedCards.push(card2, card3, card4);
 
-    const action = card.play(player, game) as SelectCard<ICard>;
+    const action = card.play(player) as SelectCard<ICard>;
     expect(action instanceof SelectCard).is.true;
     action.cb([card2]);
     expect(player.getResourcesOnCard(card2)).to.eq(1);
@@ -37,13 +38,13 @@ describe('HydrogenToVenus', function() {
     const card3 = new ColonizerTrainingCamp();
     player.playedCards.push(card2, card3);
 
-        card.play(player, game) as SelectCard<ICard>;
+        card.play(player) as SelectCard<ICard>;
         expect(player.getResourcesOnCard(card2)).to.eq(1);
         expect(game.getVenusScaleLevel()).to.eq(2);
   });
 
   it('Should play with no venus cards', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.undefined;
     expect(game.getVenusScaleLevel()).to.eq(2);
   });

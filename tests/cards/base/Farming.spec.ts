@@ -3,7 +3,7 @@ import {Farming} from '../../../src/cards/base/Farming';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Farming', function() {
   let card : Farming; let player : Player; let game : Game;
@@ -11,16 +11,17 @@ describe('Farming', function() {
   beforeEach(function() {
     card = new Farming();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
     (game as any).temperature = 4;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
     card.play(player);
 
     expect(player.getProduction(Resources.MEGACREDITS)).to.eq(2);

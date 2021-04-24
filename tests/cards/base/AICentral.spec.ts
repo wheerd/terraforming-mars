@@ -3,15 +3,16 @@ import {AICentral} from '../../../src/cards/base/AICentral';
 import {Player} from '../../../src/Player';
 import {Game} from '../../../src/Game';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('AICentral', function() {
-  let card : AICentral; let player : Player; let game : Game;
+  let card : AICentral; let player : Player;
 
   beforeEach(function() {
     card = new AICentral();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play if not enough science tags to play', function() {
@@ -25,7 +26,7 @@ describe('AICentral', function() {
 
   it('Should play', function() {
     player.playedCards.push(card, card, card);
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
 
     card.play(player);
     expect(player.getProduction(Resources.ENERGY)).to.eq(0);
@@ -34,7 +35,7 @@ describe('AICentral', function() {
   });
 
   it('Should take action', function() {
-    card.action(player, game);
+    card.action(player);
     expect(player.cardsInHand).has.lengthOf(2);
   });
 });

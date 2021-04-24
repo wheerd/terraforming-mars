@@ -6,7 +6,7 @@ import {TileType} from '../../../src/TileType';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {EcologicalZoneAres} from '../../../src/cards/ares/EcologicalZoneAres';
 import {ARES_OPTIONS_NO_HAZARDS} from '../../ares/AresTestHelper';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('EcologicalZoneAres', function() {
   let card : EcologicalZoneAres; let player : Player; let game : Game;
@@ -14,22 +14,23 @@ describe('EcologicalZoneAres', function() {
   beforeEach(function() {
     card = new EcologicalZoneAres();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player, ARES_OPTIONS_NO_HAZARDS);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player, ARES_OPTIONS_NO_HAZARDS);
   });
 
   it('Should play', function() {
     const landSpace = game.board.getAvailableSpacesOnLand(player)[0];
     game.addGreenery(player, landSpace.id);
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action instanceof SelectSpace).is.true;
 
     const adjacentSpace = action.availableSpaces[0];
     action.cb(adjacentSpace);
     expect(adjacentSpace.tile && adjacentSpace.tile.tileType).to.eq(TileType.ECOLOGICAL_ZONE);
 
-    card.onCardPlayed(player, game, card);
+    card.onCardPlayed(player, card);
     expect(card.resourceCount).to.eq(2);
     expect(card.getVictoryPoints()).to.eq(1);
     expect(adjacentSpace.adjacency).to.deep.eq({bonus: [SpaceBonus.ANIMAL]});

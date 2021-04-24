@@ -4,15 +4,16 @@ import {InterstellarColonyShip} from '../../../src/cards/base/InterstellarColony
 import {Research} from '../../../src/cards/base/Research';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('InterstellarColonyShip', function() {
-  let card : InterstellarColonyShip; let player : Player; let game : Game;
+  let card : InterstellarColonyShip; let player : Player;
 
   beforeEach(function() {
     card = new InterstellarColonyShip();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -23,7 +24,7 @@ describe('InterstellarColonyShip', function() {
     player.playedCards.push(new Research(), new Research(), new GeneRepair());
     expect(card.canPlay(player)).is.true;
 
-    card.play(player, game);
+    card.play(player);
     player.victoryPointsBreakdown.setVictoryPoints('victoryPoints', card.getVictoryPoints());
     expect(player.victoryPointsBreakdown.victoryPoints).to.eq(4);
   });

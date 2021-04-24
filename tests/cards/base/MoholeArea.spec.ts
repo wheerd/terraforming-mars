@@ -4,14 +4,15 @@ import {Game} from '../../../src/Game';
 import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {Resources} from '../../../src/Resources';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('MoholeArea', function() {
   it('Should play', function() {
     const card = new MoholeArea();
     const player = TestPlayers.BLUE.newPlayer();
-    const game = new Game('foobar', [player, player], player);
-    const action = card.play(player, game);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
+    const action = card.play(player);
 
     expect(action).is.not.undefined;
     expect(action instanceof SelectSpace).is.true;

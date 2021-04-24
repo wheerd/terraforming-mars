@@ -2,7 +2,8 @@ import {expect} from 'chai';
 import {ArcticAlgae} from '../../../src/cards/base/ArcticAlgae';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('ArcticAlgae', function() {
   let card : ArcticAlgae; let player : Player; let player2 : Player; let game : Game;
@@ -11,12 +12,12 @@ describe('ArcticAlgae', function() {
     card = new ArcticAlgae();
     player = TestPlayers.BLUE.newPlayer();
     player2 = TestPlayers.RED.newPlayer();
-    game = new Game('foobar', [player, player2], player);
+    game = Game.newInstance('foobar', [player, player2], player);
   });
 
   it('Can\'t play', function() {
     (game as any).temperature = -10;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
@@ -25,6 +26,7 @@ describe('ArcticAlgae', function() {
     player.playedCards.push(card);
 
     game.addOceanTile(player2, game.board.getAvailableSpacesForOcean(player2)[0].id);
+    TestingUtils.runNextAction(game);
     expect(player.plants).to.eq(3);
   });
 });

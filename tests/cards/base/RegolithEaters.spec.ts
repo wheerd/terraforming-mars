@@ -3,7 +3,7 @@ import {RegolithEaters} from '../../../src/cards/base/RegolithEaters';
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('RegolithEaters', function() {
   let card : RegolithEaters; let player : Player; let game : Game;
@@ -11,18 +11,19 @@ describe('RegolithEaters', function() {
   beforeEach(function() {
     card = new RegolithEaters();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should act', function() {
     player.playedCards.push(card);
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action).is.undefined;
     expect(card.resourceCount).to.eq(1);
 
-    card.action(player, game);
+    card.action(player);
     expect(card.resourceCount).to.eq(2);
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions instanceof OrOptions).is.true;
 
         orOptions!.options[1].cb();

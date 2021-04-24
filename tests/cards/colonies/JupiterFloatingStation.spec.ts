@@ -3,15 +3,16 @@ import {JupiterFloatingStation} from '../../../src/cards/colonies/JupiterFloatin
 import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('JupiterFloatingStation', function() {
-  let card : JupiterFloatingStation; let player : Player; let game : Game;
+  let card : JupiterFloatingStation; let player : Player;
 
   beforeEach(function() {
     card = new JupiterFloatingStation();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Should play', function() {
@@ -24,7 +25,7 @@ describe('JupiterFloatingStation', function() {
     expect(card.canAct()).is.true;
 
     player.addResourceTo(card, 7);
-    const orOptions = card.action(player, game) as OrOptions;
+    const orOptions = card.action(player) as OrOptions;
     expect(orOptions instanceof OrOptions).is.true;
         orOptions!.options[1].cb();
         expect(player.megaCredits).to.eq(4);

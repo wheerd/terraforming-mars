@@ -6,15 +6,16 @@ import {Game} from '../../../src/Game';
 import {OrOptions} from '../../../src/inputs/OrOptions';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Astrodrill', function() {
-  let card : Astrodrill; let player : Player; let game : Game;
+  let card : Astrodrill; let player : Player;
 
   beforeEach(function() {
     card = new Astrodrill();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
 
     card.play();
     player.corporationCard = card;
@@ -25,7 +26,7 @@ describe('Astrodrill', function() {
   });
 
   it('Should play - can spend asteroid resource', function() {
-    const action = card.action(player, game) as OrOptions;
+    const action = card.action(player) as OrOptions;
     expect(action instanceof OrOptions).is.true;
     expect(action.options).has.lengthOf(3);
 
@@ -33,11 +34,11 @@ describe('Astrodrill', function() {
     const spendAsteroidOption = action.options[0];
     spendAsteroidOption.cb();
     expect(player.titanium).to.eq(3);
-    expect(game.deferredActions).has.lengthOf(0);
+    expect(player.game.deferredActions).has.lengthOf(0);
   });
 
   it('Should play - can add asteroid resource to self', function() {
-    const action = card.action(player, game) as OrOptions;
+    const action = card.action(player) as OrOptions;
     expect(action instanceof OrOptions).is.true;
     expect(action.options).has.lengthOf(3);
 
@@ -52,7 +53,7 @@ describe('Astrodrill', function() {
     const cometAiming = new CometAiming();
     player.playedCards.push(cometAiming);
 
-    const action = card.action(player, game) as OrOptions;
+    const action = card.action(player) as OrOptions;
     expect(action instanceof OrOptions).is.true;
     const addAsteroidOption = action.options[1] as SelectCard<ICard>;
 
@@ -62,7 +63,7 @@ describe('Astrodrill', function() {
   });
 
   it('Should play - can gain a standard resource', function() {
-    const action = card.action(player, game) as OrOptions;
+    const action = card.action(player) as OrOptions;
     expect(action instanceof OrOptions).is.true;
     expect(action.options).has.lengthOf(3);
 

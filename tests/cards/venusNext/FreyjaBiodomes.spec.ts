@@ -7,7 +7,7 @@ import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
 import {Resources} from '../../../src/Resources';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('FreyjaBiodomes', function() {
   let card : FreyjaBiodomes; let player : Player; let game : Game;
@@ -15,29 +15,30 @@ describe('FreyjaBiodomes', function() {
   beforeEach(function() {
     card = new FreyjaBiodomes();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play without energy production', function() {
     (game as any).venusScaleLevel = 10;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Can\'t play if Venus requirement not met', function() {
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     (game as any).venusScaleLevel = 8;
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play - single target', function() {
     const card2 = new Extremophiles();
     player.playedCards.push(card2);
 
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     (game as any).venusScaleLevel = 10;
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    card.play(player, game);
+    card.play(player);
     expect(player.getProduction(Resources.ENERGY)).to.eq(0);
     expect(player.getProduction(Resources.MEGACREDITS)).to.eq(2);
     expect(player.getResourcesOnCard(card2)).to.eq(2);
@@ -46,10 +47,10 @@ describe('FreyjaBiodomes', function() {
   it('Should play - multiple targets', function() {
     const card2 = new Extremophiles();
     const card3 = new VenusianAnimals();
-    player.addProduction(Resources.ENERGY);
+    player.addProduction(Resources.ENERGY, 1);
     player.playedCards.push(card2, card3);
 
-    const action = card.play(player, game) as SelectCard<ICard>;
+    const action = card.play(player) as SelectCard<ICard>;
     expect(action instanceof SelectCard).is.true;
 
     action.cb([card2]);

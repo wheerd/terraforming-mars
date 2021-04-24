@@ -6,42 +6,52 @@ import {SpaceType} from '../../../src/SpaceType';
 import {TileType} from '../../../src/TileType';
 import {SelectSpace} from '../../../src/inputs/SelectSpace';
 import {Resources} from '../../../src/Resources';
-import {maxOutOceans, TestPlayers} from '../../TestingUtils';
-import {Board} from '../../../src/Board';
+import {TestingUtils} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
+import {Board} from '../../../src/boards/Board';
 
-describe('Capital', function() {
+describe('Capital', () => {
   let card : Capital; let player : Player; let game : Game;
 
-  beforeEach(function() {
+  beforeEach(() => {
     card = new Capital();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    game = Game.newInstance('foobar', [player, redPlayer], player);
   });
 
-  it('Can\'t play without energy production', function() {
-    maxOutOceans(player, game);
-    expect(card.canPlay(player, game)).is.not.true;
+  it('Cannot play without 2 energy production', () => {
+    TestingUtils.maxOutOceans(player, 4);
+    player.addProduction(Resources.ENERGY, 1);
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Can\'t play if oceans requirement not met', function() {
+  it('Cannot play if oceans requirement not met', () => {
+    TestingUtils.maxOutOceans(player, 3);
     player.addProduction(Resources.ENERGY, 2);
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
-  it('Should play', function() {
+  it('Can play', () => {
+    TestingUtils.maxOutOceans(player, 4);
+    player.addProduction(Resources.ENERGY, 2);
+    expect(card.canPlay(player)).is.true;
+  });
+
+  it('Should play', () => {
     const oceanSpaces = game.board.getAvailableSpacesForOcean(player);
     for (let i = 0; i < 4; i++) {
       oceanSpaces[i].tile = {tileType: TileType.OCEAN};
     }
     player.addProduction(Resources.ENERGY, 2);
-    expect(card.canPlay(player, game)).is.true;
+    expect(card.canPlay(player)).is.true;
 
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action instanceof SelectSpace).is.true;
     expect(player.getProduction(Resources.ENERGY)).to.eq(0);
     expect(player.getProduction(Resources.MEGACREDITS)).to.eq(5);
 
-    const citySpace = game.board.getAdjacentSpaces(oceanSpaces[0])[0];
+    const citySpace = game.board.getAdjacentSpaces(oceanSpaces[0])[1];
     expect(citySpace.spaceType).to.eq(SpaceType.LAND);
     action.cb(citySpace);
 
@@ -49,11 +59,11 @@ describe('Capital', function() {
     expect(citySpace.player).to.eq(player);
     expect(citySpace.tile && citySpace.tile.tileType).to.eq(TileType.CAPITAL);
     expect(player.victoryPointsBreakdown.victoryPoints).to.eq(0);
-    expect(card.getVictoryPoints(player, game)).to.eq(1);
+    expect(card.getVictoryPoints(player)).to.eq(1);
     expect(citySpace.adjacency?.bonus).eq(undefined);
   });
 
-  it('Capital special tile counts as a city', function() {
+  it('Capital special tile counts as a city', () => {
     const space = game.board.getNthAvailableLandSpace(2, 1, player);
     game.addTile(player, SpaceType.LAND, space, {
       tileType: TileType.CAPITAL,
@@ -68,6 +78,6 @@ describe('Capital', function() {
     // check VP
     const greenerySpace = game.board.getAdjacentSpaces(space).find((space) => space.spaceType === SpaceType.LAND);
     game.addGreenery(player, greenerySpace!.id);
-    expect(player.getVictoryPoints(game).city).to.eq(1); // 1 VP for Capital city
+    expect(player.getVictoryPoints().city).to.eq(1); // 1 VP for Capital city
   });
 });

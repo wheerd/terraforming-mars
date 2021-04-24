@@ -5,15 +5,16 @@ import {Extremophiles} from '../../../src/cards/venusNext/Extremophiles';
 import {Game} from '../../../src/Game';
 import {SelectCard} from '../../../src/inputs/SelectCard';
 import {Player} from '../../../src/Player';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Extremophiles', function() {
-  let card : Extremophiles; let player : Player; let game : Game;
+  let card : Extremophiles; let player : Player;
 
   beforeEach(function() {
     card = new Extremophiles();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
@@ -29,13 +30,13 @@ describe('Extremophiles', function() {
 
   it('Should act', function() {
     player.playedCards.push(card);
-    card.action(player, game);
+    card.action(player);
     expect(card.resourceCount).to.eq(1);
   });
 
   it('Should act - multiple targets', function() {
     player.playedCards.push(card, new Tardigrades());
-    const action = card.action(player, game);
+    const action = card.action(player);
     expect(action instanceof SelectCard).is.true;
 
         action!.cb([card]);

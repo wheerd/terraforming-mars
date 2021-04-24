@@ -3,23 +3,24 @@ import {Mangrove} from '../../../src/cards/base/Mangrove';
 import {Game} from '../../../src/Game';
 import {Player} from '../../../src/Player';
 import {TileType} from '../../../src/TileType';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('Mangrove', function() {
-  let card : Mangrove; let player : Player; let game : Game;
+  let card : Mangrove; let player : Player;
 
   beforeEach(function() {
     card = new Mangrove();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player);
   });
 
   it('Can\'t play', function() {
-    expect(card.canPlay(player, game)).is.not.true;
+    expect(card.canPlay(player)).is.not.true;
   });
 
   it('Should play', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
 
     action.cb(action.availableSpaces[0]);

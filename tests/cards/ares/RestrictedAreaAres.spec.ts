@@ -5,19 +5,20 @@ import {TileType} from '../../../src/TileType';
 import {RestrictedAreaAres} from '../../../src/cards/ares/RestrictedAreaAres';
 import {SpaceBonus} from '../../../src/SpaceBonus';
 import {ARES_OPTIONS_NO_HAZARDS} from '../../ares/AresTestHelper';
-import {TestPlayers} from '../../TestingUtils';
+import {TestPlayers} from '../../TestPlayers';
 
 describe('RestrictedAreaAres', function() {
-  let card : RestrictedAreaAres; let player : Player; let game : Game;
+  let card : RestrictedAreaAres; let player : Player;
 
   beforeEach(function() {
     card = new RestrictedAreaAres();
     player = TestPlayers.BLUE.newPlayer();
-    game = new Game('foobar', [player, player], player, ARES_OPTIONS_NO_HAZARDS);
+    const redPlayer = TestPlayers.RED.newPlayer();
+    Game.newInstance('foobar', [player, redPlayer], player, ARES_OPTIONS_NO_HAZARDS);
   });
 
   it('Should play', function() {
-    const action = card.play(player, game);
+    const action = card.play(player);
     expect(action).is.not.undefined;
 
     const space = action.availableSpaces[0];

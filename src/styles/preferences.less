@@ -10,11 +10,17 @@
     align-items: center;
     height: 100%;
 }
+.preferences_acting_player {
+    background: linear-gradient(180deg, #303030 0%, #303030 25%, #745B54 80%, #745B54 100%);
+}
+.preferences_nonacting_player {
+    background: #303030;
+}
 .preferences-divider {
     background: rgba(170, 170, 170, 0.3);
     height: 2px;
-    width: 80%;	
-    margin-bottom: 8px;	
+    width: 80%;
+    margin-bottom: 8px;
 }
 .preferences_item {
     width: 46px;
@@ -25,6 +31,14 @@
 }
 .preferences_item_shortcut {
     height: 60px;
+}
+
+.preferences_item--info {
+    position: absolute;
+    bottom: 111px;
+    left: 0px;
+    margin-left: 7px;
+    height: 46px
 }
 
 .preferences_item--help {
@@ -76,6 +90,29 @@
     width: 26px;
     height: 26px;
     border-radius: 3px;
+    &.active {
+        -webkit-animation: rotation 8s infinite linear;
+        animation: rotation 8s infinite linear;
+        box-shadow: 0 0 5px 2px #fff;
+    }
+}
+
+@-webkit-keyframes rotation {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(359deg);
+    }
+}
+
+@keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(359deg);
+    }
 }
 
 .preferences_global_params {
@@ -153,6 +190,11 @@
     background-image: url(assets/sidebar/preferences_board.png);
 }
 
+.preferences_icon.preferences_icon--info {
+    background-image: url(assets/sidebar/preferences_info.png);
+    background-size: 36px 36px;
+}
+
 .preferences_icon.preferences_icon--help {
     background-image: url(assets/sidebar/preferences_help.png);
     background-size: 36px 36px;
@@ -201,7 +243,11 @@
 .preferences_small_cards .filterDiv,
 .preferences_small_cards .filterDiv:hover {
     transform: scale(0.8);
-    margin: -22px -15px 15px -15px;
+    margin: -22px -15px -15px -15px;
+}
+.preferences_small_cards .filterDiv.card-standard-project,
+.preferences_small_cards .filterDiv:hover.card-standard-project {
+    margin: -0px -10px -15px -10px;
 }
 
 .preferences_small_cards input[type="checkbox"]:checked + .filterDiv,
@@ -210,17 +256,9 @@
 }
 
 /* Hide blocks */
-.preferences_hide_turnorder .player_home_block--turnorder,
-.preferences_hide_corporation .player_home_block--corporation,
 .preferences_hide_hand .player_home_block--hand,
 .preferences_hide_awards_and_milestones
-    .player_home_block--milestones-and-awards,
-.preferences_hide_tag_overview .tag-overview-cont,
-.preferences_hide_corporation_names .player_home_block--corp-names,
-.preferences_hide_ma_scores .player_home_block--milestones-and-awards-scores,
-.preferences_hide_non_blue_cards .player_home_block--non_blue_cards,
-.preferences_hide_log .player_home_block--hide_log,
-.preferences_hide_cards .player_home_block--cards{
+    .player_home_block--milestones-and-awards{
     display: none;
 }
 
@@ -250,14 +288,31 @@
     transform: scale(0.95);
 }
 
-/* Description Magnification */
-.preferences_magnify_card_descriptions .description:hover {
-    background: #fffd;
-    transform: scale(1.5);
-    border-radius: 5px;
-    width: 150px;
-    margin-left: 31px;
-    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.6);
-    padding: 3px;
-    z-index: 5;
+.info_panel-spacing{
+    padding-bottom: 40px;
+}
+
+.info-panel-title{
+    font-size: 25px;
+    font-style: normal;
+    font-family: Arial;
+    font-weight: bold;
+    text-align: left;
+    padding-bottom: 15px;
+}
+
+.info_panel {
+    padding: 15px 15px 15px 20px;
+    display: inline-block;
+    position: absolute;
+    bottom: 0px;
+    left: 53px;
+    color: #c6c6c6;
+    background: #000000;
+    max-height: calc(85vh);
+    overflow-y: auto;
+}
+
+.info_panel_actions {
+    text-align: center;
 }
